@@ -21,8 +21,8 @@ This is an practice Android project that provides information about the popular 
 ## What I learned
 
 - How to build an MVVM architecture according to the principle of separation of concerns in Android Project.
-- How to change the color of the tab in the tab layout when the tab is selected.
-- How to use Data Binding to implement UI changes through Binding Adapters.
+- How to change the color of the tab in the `tabLayout` when the tab is selected.
+- How to use `dataBinding` to implement UI changes through Binding Adapters.
 
 ## PlayStore
 The app is available on the PlayStore. If you want to see how it works, you can download it here

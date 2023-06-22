@@ -5,6 +5,8 @@ This is an practice Android project that provides information about the popular 
 
 ## Demo Video
 
+https://github.com/jhj0517/UniteWiki/assets/97279763/e73ece5e-a6cd-4f0f-983d-d02e340db174
+
 ## Feature
 - Provide Pokémon information by type, in the form of `tabLayout` and `RecyclerView`.
 - See the different abilities of each Pokémon, in the form of `tooltips`.

@@ -1,0 +1,99 @@
+<resources>
+    <string name="OAuth_client_ID" translatable="false">838239218135-pkgc844hnt1mos7hnktlnn4h7puabh1f.apps.googleusercontent.com</string>
+
+    <string name="AdmobAppID">ca-app-pub-7238488020188499~3437667695</string>
+    <string name="AdmobTestID">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="app_name">유나이트 위키_0.85</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="attackcolor"><![CDATA[<font color=#DC482D>어택</font>]]></string>
+
+    <string name="attack_choiced"><u>어택</u></string>
+    <string name="attack">어택</string>
+
+    <string name="speedcolor"><![CDATA[<font color=#195ECD>스피드</font>]]></string>
+
+    <string name="speed_choiced"><u>스피드</u></string>
+    <string name="speed">스피드</string>
+
+    <string name="defensecolor"><![CDATA[<font color=#61C11F>디펜스</font>]]></string>
+
+    <string name="defense_choiced"><u>디펜스</u></string>
+    <string name="defense">디펜스</string>
+
+    <string name="balancecolor"><![CDATA[<font color=#A34AA4>밸런스</font>]]></string>
+
+    <string name="balance">밸런스</string>
+    <string name="balacne_choiced"><u>밸런스</u></string>
+
+    <string name="supportcolor"><![CDATA[<font color=#FEB323>서포트</font>]]></string>
+
+    <string name="support_choiced"><u>서포트</u></string>
+    <string name="support">서포트</string>
+
+    <string name="longest_tabword">세글자</string>
+
+    <string name="loginisprogressing">로그인 중입니다..</string>
+
+    <string name="sort">정렬</string>
+    <string name="reviewreported">리뷰가 신고되었습니다.</string>
+
+    <string name="likes">좋아요</string>
+    <string name="Newestfirst">최신순</string>
+    <string name="uniteskill">유나이트 스킬</string>
+    <string name="wirteyourownreview">아직 작성된 리뷰가 없습니다.\n리뷰를 작성해주세요!</string>
+
+
+    <string name="Report">신고</string>
+    <string name="edit">수정</string>
+    <string name="edited">(수정됨)</string>
+    <string name="delete">삭제</string>
+
+    <string name="SearchaPokemon">검색하세요.</string>
+
+    <string name="Setting">설정</string>
+
+    <string name="rating">별점</string>
+    <string name="recommendedmoves">추천 스킬</string>
+    <string name="reviewwrting">리뷰 작성</string>
+    <string name="ratethispokemon">포켓몬 평가하기</string>
+    <string name="post">게시</string>
+    <string name="Write">글쓰기</string>
+    <string name="Writeareviewplease">작성해주세요!</string>
+
+    <string name="discarddarft">글쓰기를 취소합니까?</string>
+    <string name="no">아니요</string>
+
+    <string name="login">구글 로그인</string>
+    <string name="logout">로그아웃</string>
+    <string name="loginwithotheraccount">계정 변경</string>
+    <string name="skill">스킬</string>
+    <string name="review">리뷰</string>
+    <string name="bussinessandsuggestions">유나이트 위키</string>
+    <string name="Thisappisfanapp">이 어플리케이션은 팬 앱이며 포켓몬 유나이트에 대해 어떤 권리도 소유하고 있지 않습니다.</string>
+    <string name="pleaseenteryourguide">이 포켓몬에 관해 적어주세요!\n</string>
+    <string name="commnutiryrule">유나이트 위키는 커뮤니티 이용규칙을 제정하여 운영하고 있습니다.\n*규칙위반 사항\n-타인의 권리를 침해하거나 불쾌감을 주는 행위 \n-범죄,불법 행위 등 법령을 위반하는 행위
+    \n-욕설, 비하, 차별, 혐오, 자살, 폭력 관련 내용을 포함한 게시물 작성 행위 </string>
+    <string name="numwithpercent">%d%%</string>
+
+    <string name="numwithbracket">(%d)</string>
+
+    <string name="langauge">언어</string>
+
+    <string name="pokemonranking">순위</string>
+
+    <string name="ok">네</string>
+    <string name="selectskills">추천스킬을 선택해주세요.</string>
+    <string name="myreview">내 리뷰</string>
+    <string name="reviews">리뷰</string>
+
+    <string name="needlogingtodothis">로그인이 필요한 기능입니다.</string>
+
+    <string name="deletereivewsuccess">리뷰를 삭제하였습니다.</string>
+    <string name="userschoose">의 유저가 선택했습니다.</string>
+
+    <string name="questionemail">문의 이메일</string>
+    <string name="unitewikigmail">unitewikipedia@gmail.com</string>
+    <string name="signinwassuccessful">로그인에 성공하였습니다.</string>
+    <string name="needtologin">로그인이 필요합니다.</string>
+</resources>

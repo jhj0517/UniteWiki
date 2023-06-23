@@ -1,0 +1,47 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+buildscript {
+    ext.kotlin_version = "1.5.31"
+    repositories {
+        google()
+        mavenCentral()
+    }
+
+    dependencies {
+        def nav_version = "2.4.2"
+        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$nav_version"
+        classpath 'com.google.dagger:hilt-android-gradle-plugin:2.41'
+        classpath 'com.android.tools.build:gradle:7.0.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        //gms
+        classpath 'com.google.gms:google-services:4.3.10'
+    }
+
+    ext {
+        lifecycleVersion = '2.3.1'
+        glideVersion = '4.12.0'
+        hiltVersion = '2.41'
+        navVersion = '2.4.2'
+        firebaseBomVersion = '28.4.0'
+        firebaseAuthVersion = '21.0.1'
+        firebaseAuthUIVersion = '7.2.0'
+        googleSignInVersion = '19.2.0'
+        realtimeDataBaseVersion = '20.0.2'
+        pagingVersion = '3.1.1'
+        coroutinePlayServiceVersion = '1.4.3-native-mt'
+        coroutinesVersion = '1.4.3'
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        jcenter()
+
+        maven { url 'https://jitpack.io' }
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

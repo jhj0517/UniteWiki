@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".views.fragments.PokemonReviewsFragment">
+
+    <!--여기서 프로그레스바 하나 넣을 거임.-->
+    <data>
+        <variable
+            name="IsEmpty"
+            type="boolean"/>
+
+        <variable
+            name="doIwritereivew"
+            type="boolean"/>
+
+    </data>
+
+<FrameLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.appbar.CollapsingToolbarLayout
+        app:layout_constraintTop_toTopOf="parent"
+        android:id="@+id/collapsingToolbarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"/>
+
+        <TextView
+            android:id="@+id/pokemon_name_intoolbar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:fontFamily="@font/aritadotum_medium"
+            android:text="포켓몬"
+            android:textSize="25sp" />
+
+        <ImageView
+            android:id="@+id/navigate_backbtn"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/back_button_nocircle"
+            android:clickable="true"
+            android:background="?attr/selectableItemBackgroundBorderless"/>
+
+        <RelativeLayout
+            android:id="@+id/btn_setting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|end"
+            android:paddingLeft="15dp"
+            android:clickable="true"
+            android:background="?attr/selectableItemBackground">
+            <ImageView
+                android:layout_width="35dp"
+                android:layout_height="match_parent"
+                android:layout_marginRight="10dp"
+                android:src="@drawable/ic_hamburger"
+                app:tint="#424141"/>
+        </RelativeLayout>
+    </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+    <FrameLayout
+        android:id="@+id/frameLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="?attr/actionBarSize">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/sorting_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:paddingLeft="10dp"
+                    android:paddingTop="5dp"
+                    app:isVisible="@{!IsEmpty}"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <ImageView
+                        android:id="@+id/sortingIcon"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:src="@drawable/menu_icon_right"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/sort"
+                        android:textSize="17sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintRight_toLeftOf="@id/sortingIcon"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <TextView
+                    android:id="@+id/myreviewtext"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:fontFamily="@font/aritadotum_medium"
+                    android:text="@string/myreview"
+                    android:textSize="15sp"
+                    app:isVisible="@{doIwritereivew}"
+                    app:layout_constraintLeft_toRightOf="@id/ganpan"
+                    app:layout_constraintTop_toBottomOf="@id/sorting_button" />
+
+                <ImageView
+                    android:id="@+id/ganpan"
+                    android:layout_width="6dp"
+                    android:layout_height="15dp"
+                    android:src="@drawable/splash_screen"
+                    app:isVisible="@{doIwritereivew}"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/sorting_button" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/myreview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="12dp"
+                    app:isVisible="@{doIwritereivew}"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/ganpan" />
+
+                <TextView
+                    android:id="@+id/reviewstext"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="20dp"
+                    android:fontFamily="@font/aritadotum_medium"
+                    android:text="@string/reviews"
+                    android:textSize="15sp"
+                    app:isVisible="@{!IsEmpty}"
+                    app:layout_constraintLeft_toRightOf="@id/ganpan2"
+                    app:layout_constraintTop_toBottomOf="@id/myreview" />
+
+                <ImageView
+                    android:id="@+id/ganpan2"
+                    android:layout_width="6dp"
+                    android:layout_height="15dp"
+                    android:layout_marginTop="20dp"
+                    android:src="@drawable/splash_screen"
+                    app:isVisible="@{!IsEmpty}"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/myreview" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/reviews_recyclerview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="10dp"
+                    android:paddingBottom="30dp"
+                    app:isVisible="@{!IsEmpty}"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/ganpan2" />
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.core.widget.NestedScrollView>
+
+    </FrameLayout>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/writing_button_root"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_gravity="center_horizontal|bottom"
+        android:layout_marginBottom="30dp"
+        app:isVisible="@{!IsEmpty || doIwritereivew }">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/writing_button_image"
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:src="@drawable/writing_button"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginRight="50dp"
+            android:text="@string/Write"
+            android:fontFamily="@font/aritadotum_medium"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:isVisible="@{ !doIwritereivew &amp;&amp; IsEmpty }"
+        app:layout_anchor="@+id/frameLayout"
+        app:layout_anchorGravity="center">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/writing_button_empty_root"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:isVisible="@{ !doIwritereivew &amp;&amp; IsEmpty }"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/writing_button_empty"
+                android:layout_width="150dp"
+                android:layout_height="50dp"
+                android:src="@drawable/writing_button"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/writing_button_text"
+                android:layout_width="83dp"
+                android:layout_height="53dp"
+                android:layout_marginRight="25dp"
+                android:fontFamily="@font/aritadotum_medium"
+                android:gravity="center"
+                android:text="@string/Write"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/aritadotum_medium"
+                android:gravity="center"
+                android:text="@string/Writeareviewplease"
+                android:textSize="20sp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/writing_button_empty" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+<!--        <ProgressBar-->
+<!--        android:id="@+id/loadingcircle"-->
+<!--        android:layout_width="50dp"-->
+<!--        android:layout_height="50dp"-->
+<!--        android:layout_gravity="center"-->
+<!--        android:indeterminateTint="@color/weakgrey"-->
+<!--        android:indeterminateTintMode="src_in"-->
+<!--        android:indeterminate="true"-->
+<!--        app:isVisible="@{FullLoaded}"/>-->
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+</FrameLayout>
+</layout>

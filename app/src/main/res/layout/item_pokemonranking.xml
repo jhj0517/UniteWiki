@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="rating"
+            type="float" />
+
+        <variable
+            name="clickListener"
+            type="android.view.View.OnClickListener"/>
+
+        <variable
+            name="viewModel"
+            type="com.unitewikiapp.unitewiki.viewmodels.PokemonRankAdapterViewModel" />
+    </data>
+
+<FrameLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="70dp"
+    android:id="@+id/linear_layout"
+    android:orientation="horizontal"
+    android:clickable="true"
+    android:focusable="true"
+    android:background="@drawable/button_custom_effect_square">
+
+    <TextView
+        android:id="@+id/rank"
+        android:layout_width="25dp"
+        android:layout_height="match_parent"
+        android:textColor="@color/weakgrey" 
+        android:textSize="18sp"
+        android:fontFamily="@font/aritadotum_medium"
+        android:gravity="center"
+        android:text="1"/>
+
+    <ImageView
+        android:id="@+id/ic_Pokemon"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
+        android:layout_marginStart="5dp"
+        app:imageFromUrl="@{viewModel.icPokemon}"/>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/circle"
+        android:src="@drawable/ic_thin_circle"
+        android:tint="@color/black"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
+        android:layout_marginStart="-50dp"/>
+
+    <LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:layout_marginStart="10dp">
+
+        <TextView
+            android:id="@+id/id_Pokemon_name"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:textSize="13sp"
+            android:text="@{viewModel.pokemonName}"
+            android:fontFamily="@font/aritadotum_light"
+            android:textStyle="normal"
+            android:textColor="@color/black"
+            android:gravity="center_vertical|left"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="end">
+
+        <LinearLayout
+            android:gravity="center_horizontal"
+            android:layout_gravity="center_vertical"
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp">
+
+    <TextView
+        android:id="@+id/rating_score"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="25sp"
+        android:text="@{viewModel.averageRating}"
+        android:textColor="@color/black"
+        android:fontFamily="@font/aritadotum_medium"/>
+
+    <RatingBar
+        android:isIndicator="true"
+        android:id="@+id/rating_bar"
+        android:layout_marginTop="2dp"
+        android:progressDrawable="@drawable/custom_ratingbar_15dp"
+        android:layout_width="wrap_content"
+        android:layout_height="15dp"
+        android:numStars="5"
+        android:stepSize="0.1"
+        android:rating="@{viewModel.averageRatingRatingBar}"/>
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/justfor_background"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginStart="30dp"
+        android:background="@drawable/bottom_border_beauty">
+    </FrameLayout>
+
+</FrameLayout>
+</layout>

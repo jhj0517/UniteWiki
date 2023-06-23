@@ -1,0 +1,106 @@
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'androidx.navigation.safeargs.kotlin'
+    //hilt
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
+    //extension
+    id 'kotlin-android-extensions'
+    //gms
+    id 'com.google.gms.google-services'
+}
+
+android {
+    compileSdkVersion 31
+    buildToolsVersion "30.0.3"
+
+    //dataBinding
+    dataBinding {
+        enabled = true
+    }
+    viewBinding.enabled = true
+
+    defaultConfig {
+        applicationId "com.unitewikiapp.unitewiki"
+        minSdkVersion 26
+        targetSdkVersion 31
+        versionCode 4
+        versionName "0.85"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+}
+
+dependencies {
+    //paging
+    implementation "androidx.paging:paging-runtime:$rootProject.pagingVersion"
+    //helper object
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    //coroutine play service
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$rootProject.coroutinePlayServiceVersion"
+    //hit
+    implementation "com.google.dagger:hilt-android:$rootProject.hiltVersion"
+    kapt "com.google.dagger:hilt-compiler:$rootProject.hiltVersion"
+    //Korean search util class
+    implementation 'com.github.DeveloperJo:KoreanChosungSearch:1.0.1'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    // For apps targeting Android 12, add WorkManager dependency.
+    constraints {
+        implementation('androidx.work:work-runtime:2.7.0') {
+            because '''androidx.work:work-runtime:2.1.0 pulled from play-services-ads
+                   has a bug using PendingIntent without FLAG_IMMUTABLE or
+                   FLAG_MUTABLE and will fail in apps targeting S+.'''
+        }
+    }
+    //coroutine
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:$rootProject.coroutinesVersion")
+    // ViewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$rootProject.lifecycleVersion")
+    // LiveData
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$rootProject.lifecycleVersion"
+    // Lifecycles only (without ViewModel or LiveData)
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:$rootProject.lifecycleVersion")
+    // Saved state module for ViewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:$rootProject.lifecycleVersion")
+    //Glide
+    implementation "com.github.bumptech.glide:glide:$rootProject.glideVersion"
+    annotationProcessor "com.github.bumptech.glide:compiler:$rootProject.glideVersion"
+    //navigation
+    implementation("androidx.navigation:navigation-fragment-ktx:$rootProject.navVersion")
+    implementation("androidx.navigation:navigation-ui-ktx:$rootProject.navVersion")
+    //firebase
+    implementation platform("com.google.firebase:firebase-bom:$rootProject.firebaseBomVersion")
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+    //firebaseAuth
+    implementation "com.google.firebase:firebase-auth-ktx:$rootProject.firebaseAuthVersion"
+    //authUI
+    implementation "com.firebaseui:firebase-ui-auth:$rootProject.firebaseAuthUIVersion"
+    //googleSignIn
+    implementation "com.google.android.gms:play-services-auth:$rootProject.googleSignInVersion"
+    //realtimeDataBase
+    implementation "com.google.firebase:firebase-database-ktx:$rootProject.realtimeDataBaseVersion"
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.appcompat:appcompat:1.3.1'
+    implementation 'com.google.android.material:material:1.4.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.1'
+    testImplementation 'junit:junit:4.+'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+}

@@ -1,0 +1,101 @@
+<resources>
+
+    <string name="OAuth_client_ID" translatable="false">838239218135-pkgc844hnt1mos7hnktlnn4h7puabh1f.apps.googleusercontent.com</string>
+
+    <string name="AdmobAppID">ca-app-pub-7238488020188499~3437667695</string>
+    <string name="AdmobTestID">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="app_name">UniteWiki</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="attackcolor"><![CDATA[<font color=#DC482D>Attack</font>]]></string>
+
+    <string name="attack_choiced"><u>ATTACKER</u></string>
+    <string name="attack">ATTACKER</string>
+
+    <string name="speedcolor"><![CDATA[<font color=#195ECD>Attack</font>]]></string>
+
+    <string name="speed_choiced"><u>SPEEDSTER</u></string>
+    <string name="speed">SPEEDSTER</string>
+
+    <string name="defensecolor"><![CDATA[<font color=#61C11F>Defense</font>]]></string>
+
+    <string name="defense_choiced"><u>DEFENDER</u></string>
+    <string name="defense">DEFENDER</string>
+
+    <string name="balancecolor"><![CDATA[<font color=#A34AA4>Balance</font>]]></string>
+
+    <string name="balance">All\nROUNDER</string>
+    <string name="balacne_choiced"><u>All\nROUNDER</u></string>
+
+    <string name="supportcolor"><![CDATA[<font color=#FEB323>Support</font>]]></string>
+
+    <string name="support_choiced"><u>SUPPORTER</u></string>
+    <string name="support">SUPPORTER</string>
+
+    <string name="longest_tabword">SevensE</string>
+
+    <string name="loginisprogressing">Signing now.. Thank you.</string>
+
+    <string name="sort">sortby</string>
+    <string name="reviewreported">Review reported.</string>
+
+    <string name="commnutiryrule">Unite Wiki has established and operated community rules of use.\n *Rule violations
+        \n-Acts that infringe on or offend the rights of others \n-Acts that violate laws, such as crimes and illegal acts
+    \n- Posts that contain profanity, demeaning, discrimination, hate, suicide, or violence </string>
+
+    <string name="numwithpercent">%d%%</string>
+    <string name="numwithbracket">(%d)</string>
+
+    <string name="edit">Edit</string>
+    <string name="edited">(Edited)</string>
+    <string name="delete">Delete</string>
+
+    <string name="likes">Likes</string>
+    <string name="Newestfirst">Newest first</string>\
+
+    <string name="SearchaPokemon">Search</string>
+
+    <string name="Setting">Setting</string>
+    <string name="Report">Report</string>
+    <string name="login">Sign in with Google</string>
+    <string name="logout">Sign out</string>
+    <string name="loginwithotheraccount">Sign in with other account</string>
+    <string name="skill">Moves</string>
+    <string name="review">Reviews</string>
+    <string name="bussinessandsuggestions">Unite Wiki</string>
+    <string name="Thisappisfanapp">This is a fan app and is not affiliated with Pokemon Unite, the Pokemon Company, nor the developers nor any rights holders of the game.</string>
+
+    <string name="questionemail">unite wiki email</string>
+    <string name="unitewikigmail">unitewikipedia@gmail.com</string>
+    <string name="uniteskill">Unite Move</string>
+
+    <string name="wirteyourownreview">Write your own review\nPlease!</string>
+
+    <string name="langauge">Language</string>
+
+    <string name="pokemonranking">Ranking</string>
+    <string name="pleaseenteryourguide">Please enter your review here.\n</string>
+
+    <string name="rating">Rating</string>
+    <string name="recommendedmoves">Moves</string>
+    <string name="reviewwrting">Review</string>
+    <string name="ratethispokemon">Rate this pokemon</string>
+    <string name="post">POST</string>
+
+    <string name="ok">OK</string>
+    <string name="selectskills">Please select moves that you recommend.</string>
+    <string name="myreview">My Review</string>
+    <string name="reviews">Reviews</string>
+    <string name="needlogingtodothis">you need to sign in to do it.</string>
+    <string name="Write">Write</string>
+    <string name="Writeareviewplease">Write a review\nPlease!</string>
+
+    <string name="no">NO</string>
+
+    <string name="discarddarft">Discard draft?</string>
+
+    <string name="deletereivewsuccess">successfully deleted the reivew.</string>
+    <string name="userschoose">user\'s choice.</string>
+    <string name="signinwassuccessful">Sign-in was successful.</string>
+    <string name="needtologin">You need to sign-in.</string>
+</resources>

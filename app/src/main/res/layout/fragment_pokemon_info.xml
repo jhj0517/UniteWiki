@@ -1,0 +1,607 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout  xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".views.fragments.PokemonInfoFragment">
+    <data>
+        <variable
+            name="skill1selected"
+            type="boolean" />
+        <variable
+            name="skill3selected"
+            type="boolean" />
+
+        <variable
+            name="FullLoaded"
+            type="boolean" />
+        <variable
+            name="IscalculateEnd"
+            type="boolean" />
+
+        <variable
+            name="isReviewZero"
+            type="boolean" />
+
+        <variable
+            name="viewModel"
+            type="com.unitewikiapp.unitewiki.viewmodels.PokemonInfoViewModel" />
+
+        <variable
+            name="toolcallback"
+            type="com.unitewikiapp.unitewiki.views.fragments.PokemonInfoFragment.ToolCallback" />
+    </data>
+
+<FrameLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.appbar.CollapsingToolbarLayout
+        android:id="@+id/collapsingToolbarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent" />
+
+        <ImageView
+            android:id="@+id/pokemon_Ic_intoolbar"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_gravity="center"
+            app:imageFromUrl="@{viewModel.pokemonInfoData.ic_pokemon}"/>
+        <ImageView
+            android:id="@+id/pokemon_circle_intoolbar"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_thin_circle"/>
+
+        <ImageView
+            android:id="@+id/navigate_backbtn"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/back_button_nocircle"
+            android:clickable="true"
+            android:background="?attr/selectableItemBackgroundBorderless"/>
+
+        <RelativeLayout
+            android:id="@+id/btn_setting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|end"
+            android:paddingLeft="15dp"
+            android:clickable="true"
+            android:background="?attr/selectableItemBackground">
+            <ImageView
+                android:layout_width="35dp"
+                android:layout_height="match_parent"
+                android:layout_marginRight="10dp"
+                android:src="@drawable/ic_hamburger"
+                app:tint="#424141"/>
+        </RelativeLayout>
+    </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/info_nestedscrollview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        app:isVisible="@{FullLoaded &amp;&amp; IscalculateEnd}">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/profile"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/pokemon_ic"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:layout_marginLeft="5dp"
+                    app:imageFromUrl="@{viewModel.pokemonInfoData.ic_pokemon}"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <ImageView
+                    android:id="@+id/circle"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:layout_marginLeft="5dp"
+                    android:src="@drawable/ic_thin_circle"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <TextView
+                    android:id="@+id/pokemon_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintLeft_toRightOf="@id/pokemon_ic"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:layout_marginLeft="10dp"
+                    android:fontFamily="@font/aritadotum"
+                    android:text="@{viewModel.pokemonInfoData.pokemon_name}"
+                    android:textSize="20sp"/>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/rating_alignment"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toRightOf="@id/pokemon_name"
+                    android:layout_marginStart="40dp">
+
+                    <TextView
+                        android:id="@+id/rating_score"
+                        android:layout_width="wrap_content"
+                        android:layout_height="38dp"
+                        android:fontFamily="@font/aritadotum"
+                        android:text="@{String.valueOf(viewModel.averageRating)}"
+                        android:textSize="35sp"
+                        android:textStyle="bold"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <androidx.appcompat.widget.AppCompatRatingBar
+                        android:id="@+id/rating_bar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="15dp"
+                        app:layout_constraintTop_toBottomOf="@id/rating_score"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        android:progressDrawable="@drawable/custom_ratingbar_15dp"
+                        android:numStars="5"
+                        android:stepSize="0.1"
+                        android:isIndicator="true"
+                        android:rating="@{viewModel.averageRating}"/>
+
+                    <TextView
+                        android:id="@+id/ratings_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toBottomOf="@id/rating_bar"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        android:layout_marginTop="2dp"
+                        android:text="@{String.valueOf(viewModel.reviewSize)}"
+                        android:fontFamily="@font/aritadotum_medium"
+                        android:textSize="13sp"/>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="20dp">
+
+            <ImageView
+                android:id="@+id/ganpan"
+                android:layout_width="6dp"
+                android:layout_height="15dp"
+                android:src="@drawable/splash_screen" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:fontFamily="@font/aritadotum_medium"
+                android:textSize="15sp"
+                android:text="@string/skill" />
+
+            </LinearLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/top_bottom_border"
+                android:paddingBottom="10dp">
+
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/skillset1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toLeftOf="@id/skillset2"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <TextView
+                        android:id="@+id/skilllevel1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="@{viewModel.pokemonInfoData.skillset1_level}"
+                        android:textColor="@color/black"
+                        android:textSize="15sp"
+                        app:layout_constraintBottom_toTopOf="@id/skill1"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <ImageView
+                        android:id="@+id/skill1"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:clickable="true"
+                        android:onClick="@{(view)->toolcallback.showTooltip(viewModel.pokemonInfoData.skill1_name,viewModel.pokemonInfoData.skill1_cooltime,viewModel.pokemonInfoData.skill1_description,view)}"
+                        app:imageFromUrl="@{viewModel.pokemonInfoData.skill1}"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/skilllevel1" />
+
+                    <ImageView
+                        android:id="@+id/skill1_circle"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:src="@drawable/ic_thin_circle"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/skilllevel1" />
+
+                    <ImageView
+                        android:id="@+id/arrowbyleft1"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_marginLeft="-4dp"
+                        android:layout_marginTop="-12dp"
+                        android:src="@drawable/circle_selectbyleft"
+                        app:isVisible="@{skill1selected &amp;&amp; !isReviewZero}"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/skill1" />
+
+                    <ImageView
+                        android:id="@+id/skill2"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:layout_marginLeft="10dp"
+                        android:onClick="@{(view)->toolcallback.showTooltip(viewModel.pokemonInfoData.skill2_name,viewModel.pokemonInfoData.skill2_cooltime,viewModel.pokemonInfoData.skill2_description,view)}"
+                        app:imageFromUrl="@{viewModel.pokemonInfoData.skill2}"
+                        app:layout_constraintLeft_toRightOf="@id/skill1"
+                        app:layout_constraintTop_toBottomOf="@id/skilllevel1" />
+
+                    <ImageView
+                        android:id="@+id/skill2_circle"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:layout_marginLeft="10dp"
+                        android:src="@drawable/ic_thin_circle"
+                        app:layout_constraintLeft_toRightOf="@id/skill1"
+                        app:layout_constraintTop_toBottomOf="@id/skilllevel1" />
+
+
+                    <ImageView
+                        android:id="@+id/arrowbyright1"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_marginTop="-12dp"
+                        android:layout_marginRight="-4dp"
+                        android:src="@drawable/circle_selectbyright"
+                        app:isVisible="@{!skill1selected &amp;&amp; !isReviewZero}"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/skill2" />
+
+                    <TextView
+                        android:id="@+id/skillset1IndicatorWhenFirst"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="@{@string/numwithpercent(viewModel.firstRateSkillSet)}"
+                        android:textSize="23sp"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/skill2"
+                        app:isVisible="@{skill1selected &amp;&amp;!isReviewZero}"/>
+
+                    <TextView
+                        android:id="@+id/skillset1IndicatorWhenSecond"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="@{@string/numwithpercent(100-viewModel.firstRateSkillSet)}"
+                        android:textSize="23sp"
+                        app:isVisible="@{!skill1selected &amp;&amp; !isReviewZero}"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/skill2" />
+
+                    <TextView
+                        android:id="@+id/place_num1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintLeft_toRightOf="@id/arrowbyleft1"
+                        app:layout_constraintRight_toLeftOf="@id/arrowbyright1"
+                        app:layout_constraintTop_toBottomOf="@id/skill1"
+                        android:visibility="invisible"
+                        android:textSize="23dp"
+                        android:text="percent"
+                        android:layout_marginTop="15dp"/>
+
+                    <TextView
+                        android:id="@+id/indicatortext1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:fontFamily="@font/aritadotum_medium"
+                        android:text="@string/userschoose"
+                        android:textSize="10sp"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/place_num1"
+                        app:isVisible="@{!isReviewZero}"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/skillset2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintLeft_toRightOf="@id/skillset1"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <TextView
+                        android:id="@+id/skilllevel2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="@{viewModel.pokemonInfoData.skillset2_level}"
+                        android:textSize="15sp"
+                        android:textColor="@color/black"
+                        app:layout_constraintBottom_toTopOf="@id/skill3"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <ImageView
+                        android:id="@+id/skill3"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:onClick="@{(view)->toolcallback.showTooltip(viewModel.pokemonInfoData.skill3_name,viewModel.pokemonInfoData.skill3_cooltime,viewModel.pokemonInfoData.skill3_description,view)}"
+                        app:imageFromUrl="@{String.valueOf(viewModel.pokemonInfoData.skill3)}"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/skilllevel2" />
+
+                    <ImageView
+                        android:id="@+id/skill3_circle"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:src="@drawable/ic_thin_circle"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/skilllevel2" />
+
+                    <ImageView
+                        android:id="@+id/arrowbyleft2"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_marginLeft="-4dp"
+                        android:layout_marginTop="-12dp"
+                        android:src="@drawable/circle_selectbyleft"
+                        app:isVisible="@{skill3selected &amp;&amp; !isReviewZero}"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/skill3" />
+
+                    <ImageView
+                        android:id="@+id/skill4"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:layout_marginLeft="10dp"
+                        app:imageFromUrl="@{viewModel.pokemonInfoData.skill4}"
+                        android:onClick="@{(view)->toolcallback.showTooltip(viewModel.pokemonInfoData.skill4_name,viewModel.pokemonInfoData.skill4_cooltime,viewModel.pokemonInfoData.skill4_description,view)}"
+                        app:layout_constraintLeft_toRightOf="@id/skill3"
+                        app:layout_constraintTop_toBottomOf="@id/skilllevel2" />
+
+                    <ImageView
+                        android:id="@+id/skill4_circle"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:layout_marginLeft="10dp"
+                        android:src="@drawable/ic_thin_circle"
+                        app:layout_constraintLeft_toRightOf="@id/skill3"
+                        app:layout_constraintTop_toBottomOf="@id/skilllevel2" />
+
+                    <ImageView
+                        android:id="@+id/arrowbyright2"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/skill4"
+                        android:src="@drawable/circle_selectbyright"
+                        android:layout_marginTop="-12dp"
+                        android:layout_marginRight="-4dp"
+                        app:isVisible="@{!skill3selected &amp;&amp; !isReviewZero}"/>
+
+                    <TextView
+                        android:id="@+id/skillset2IndicatorWhenfirst"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="@{@string/numwithpercent(viewModel.secondRateSkillSet)}"
+                        android:textSize="23sp"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/skill4"
+                        app:isVisible="@{skill3selected &amp;&amp; !isReviewZero}" />
+
+                    <TextView
+                        android:id="@+id/skillset2IndicatorWhenSecond"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="@{@string/numwithpercent(100-viewModel.secondRateSkillSet)}"
+                        android:textSize="23sp"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/skill4"
+                        app:isVisible="@{!skill3selected &amp;&amp; !isReviewZero}" />
+
+                    <TextView
+                        android:id="@+id/place_num2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintLeft_toRightOf="@id/arrowbyleft2"
+                        app:layout_constraintRight_toLeftOf="@id/arrowbyright2"
+                        app:layout_constraintTop_toBottomOf="@id/skill3"
+                        android:visibility="invisible"
+                        android:textSize="23dp"
+                        android:text="70"
+                        android:layout_marginTop="15dp"/>
+
+                    <TextView
+                        android:id="@+id/indicatortext2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:fontFamily="@font/aritadotum_medium"
+                        android:text="@string/userschoose"
+                        android:textSize="10sp"
+                        app:isVisible="@{!isReviewZero}"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/place_num2" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/uniteskill"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/skillset2">
+
+                    <TextView
+                        android:id="@+id/uniteskilltext"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/uniteskill"
+                        android:textColor="@color/black"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <ImageView
+                        android:id="@+id/uniteskillimage"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        app:imageFromUrl="@{viewModel.pokemonInfoData.skill_unite}"
+                        android:layout_marginTop="3dp"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/uniteskilltext" />
+
+                    <ImageView
+                        android:id="@+id/uniteskillimage_circle"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:src="@drawable/ic_thin_circle"
+                        android:layout_marginTop="3dp"
+                        android:onClick="@{(view)->toolcallback.showTooltip(viewModel.pokemonInfoData.skill_unite_name,viewModel.pokemonInfoData.skill_unite_cooltime,viewModel.pokemonInfoData.skill_unite_description,view)}"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/uniteskilltext" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp">
+            <ImageView
+                android:id="@+id/ganpan2"
+                android:layout_width="6dp"
+                android:layout_height="15dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                android:src="@drawable/splash_screen" />
+
+            <TextView
+                android:id="@+id/reviewtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toRightOf="@id/ganpan2"
+                android:layout_marginLeft="15dp"
+                android:fontFamily="@font/aritadotum_medium"
+                android:textSize="15sp"
+                android:text="@string/review"/>
+            <TextView
+                android:id="@+id/reviewcount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toRightOf="@id/reviewtitle"
+                android:layout_marginLeft="5dp"
+                android:fontFamily="@font/aritadotum_medium"
+                android:text="@{@string/numwithbracket(viewModel.reviewSize)}"
+                android:textSize="15sp"/>
+
+            <ImageView
+                android:id="@+id/review_navigation_button"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:rotationY="180"
+                android:src="@drawable/back_button_nocircle"
+                android:background="?attr/selectableItemBackgroundBorderless"/>
+<!--            </RelativeLayout>-->
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                android:id="@+id/NoReviewIndicator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp"
+                android:gravity="center"
+                android:text="@string/wirteyourownreview"
+                android:textSize="20sp"
+                android:fontFamily="@font/aritadotum_medium"
+                app:isVisible="@{isReviewZero}"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/threeitemRecyclerview"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                app:isVisible="@{!isReviewZero}"/>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    <ProgressBar
+        android:id="@+id/loadingcircle"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
+        android:indeterminateTint="@color/weakgrey"
+        android:indeterminateTintMode="src_in"
+        android:indeterminate="true"
+        app:isVisible="@{!FullLoaded &amp;&amp; !IscalculateEnd}"/>
+
+</FrameLayout>
+</layout>

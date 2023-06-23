@@ -26,6 +26,8 @@ https://github.com/jhj0517/UniteWiki/assets/97279763/e73ece5e-a6cd-4f0f-983d-d02
 - How to change the color of the tab in the `tabLayout` when the tab is selected.
 - How to use `dataBinding` to implement UI changes through Binding Adapters.
 - How to implement the search function in `RecyclerView` using `Filterable` in the adapter.
+- How to nationalize app with different languages in Android
+- How to inject dependencies into an app using `Hilt`.
 
 ## PlayStore
 The app is available on the PlayStore. If you want to see how it works, you can download it here

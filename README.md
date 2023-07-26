@@ -30,4 +30,4 @@ https://github.com/jhj0517/UniteWiki/assets/97279763/e73ece5e-a6cd-4f0f-983d-d02
 - How to inject dependencies into an app using `Hilt`.
 
 ## PlayStore
-The app is available on the PlayStore. If you want to see how it works, you can download it here
+The app is available on the PlayStore. If you want to see how it works, you can check [here](https://play.google.com/store/apps/details?id=com.unitewikiapp.unitewiki&hl=ko&gl=US).

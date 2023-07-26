@@ -4,8 +4,7 @@ This is an practice Android project that provides information about the popular 
 **This app only provides information about the game and has nothing to do with the game itself.**
 
 ## Demo Video
-
-https://github.com/jhj0517/UniteWiki/assets/97279763/e73ece5e-a6cd-4f0f-983d-d02e340db174
+https://github.com/jhj0517/UniteWiki/assets/97279763/d42cde7a-4d85-4d8f-898c-9be0c7d90ea5
 
 ## Feature
 - Provide Pokémon information by type, in the form of `tabLayout` and `RecyclerView`.

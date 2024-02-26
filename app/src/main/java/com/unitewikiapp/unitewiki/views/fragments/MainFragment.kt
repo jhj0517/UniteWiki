@@ -69,7 +69,7 @@ class MainFragment : Fragment() {
 
             override fun onTabUnselected(tab: TabLayout.Tab?) {
                 tab!!.customView!!.title.setTypeface(ResourcesCompat.getFont(requireContext(),R.font.aritadotum),Typeface.NORMAL)
-                when(tab?.position){
+                when(tab.position){
                     //TO DO When Tab Unselected
                 }
             }

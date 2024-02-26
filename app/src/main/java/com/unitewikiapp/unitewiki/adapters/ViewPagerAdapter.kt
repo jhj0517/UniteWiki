@@ -3,7 +3,8 @@ package com.unitewikiapp.unitewiki.adapters
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.adapter.FragmentViewHolder
-import com.unitewikiapp.unitewiki.views.rankfragments.*
+import com.unitewikiapp.unitewiki.utils.Constants
+import com.unitewikiapp.unitewiki.views.fragments.PokemonRankFragment
 
 
 const val ATTACK_INDEX = 0
@@ -14,12 +15,12 @@ const val SUPPORT_INDEX = 4
 
 class ViewPagerAdapter(fragment: Fragment): FragmentStateAdapter(fragment) {
 
-    private val tabFragmentsCreators: Map<Int, () -> Fragment> = mapOf(
-        ATTACK_INDEX to { AttackPokemonFragment() },
-        SPEED_INDEX to { SpeedPokemonFragment() },
-        BALANCE_INDEX to { BalancePokemonFragment() },
-        DEFENSE_INDEX to { DefensePokemonFragment() },
-        SUPPORT_INDEX to { SupportPokemonFragment() }
+    private val tabFragmentsCreators: Map<Int, String> = mapOf(
+        ATTACK_INDEX to Constants.ATTACK_RANKING,
+        SPEED_INDEX to Constants.SPEED_RANKING,
+        BALANCE_INDEX to Constants.BALANCE_RANKING,
+        DEFENSE_INDEX to Constants.DEFENSE_RANKING,
+        SUPPORT_INDEX to Constants.SUPPORT_RANKING
     )
 
     override fun onBindViewHolder(
@@ -33,6 +34,8 @@ class ViewPagerAdapter(fragment: Fragment): FragmentStateAdapter(fragment) {
     override fun getItemCount() = tabFragmentsCreators.size
 
     override fun createFragment(position: Int): Fragment {
-        return tabFragmentsCreators[position]?.invoke() ?: throw IndexOutOfBoundsException()
+        val rankingType = tabFragmentsCreators[position]
+            ?: throw IndexOutOfBoundsException("Position not valid")
+        return PokemonRankFragment.newInstance(rankingType)
     }
 }

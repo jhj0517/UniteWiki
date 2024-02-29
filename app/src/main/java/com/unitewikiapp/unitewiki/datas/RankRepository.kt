@@ -12,22 +12,27 @@ class RankRepository @Inject constructor(
     private val rtdb:FirebaseDatabase,
     private val localeStore: LocaleStore
     ) : RealTimeDataBase {
-
+// Info repo 에서 뽑은 다음 그걸 viewmodel 에서 활용하는 식으로 가자.
     val locale = localeStore.findLocale()
 
-    suspend fun fetchRankingData(type:String): Response<ArrayList<PokemonRankData>> {
-        return try {
-            val ranksList = ArrayList<PokemonRankData>()
-
-            val ranks = rtdb.reference.child(Constants.POKEMON_RANKS+locale).child(type).get().await()
-            ranks.children.forEach { snap->
-                val data = snap.getValue(PokemonRankData::class.java)!!
-                ranksList.add(data)
-            }
-
-            Response.Success(ranksList)
-        }catch(e:Exception){
-            Response.Failure(e)
+    suspend fun fetchRankingData(type: String): Response<ArrayList<PokemonRankData>> {
+        val ranks = try {
+            rtdb.reference.child(Constants.POKEMON_INFO).get().await()
+        } catch(e:Exception){
+            return Response.Failure(e)
         }
+        val ranksList = ArrayList<PokemonRankData>()
+        ranks.children.forEach { snap->
+            val data = snap.getValue(PokemonInfoData::class.java)!!
+            val rank = PokemonRankData(
+                ic_pokemon = data.ic_pokemon,
+                pokemon_name = data.pokemon_name.ko,
+                type = data.type
+            )
+            if (type == data.type){
+                ranksList.add(rank)
+            }
+        }
+        return Response.Success(ranksList)
     }
 }

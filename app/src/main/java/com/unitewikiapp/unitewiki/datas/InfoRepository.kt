@@ -16,7 +16,7 @@ class InfoRepository @Inject constructor(
 
     private val locale = localeStore.findLocale()
 
-    suspend fun getInfoData(pokemonName:String): PokemonInfoData {
+    suspend fun getInfoData(pokemonName:String): PokemonInfoData? {
         return try {
             val info:PokemonInfoData = rtdb.reference.child(Constants.POKEMON_INFO+locale).child(pokemonName).get().await()
                 .getValue(PokemonInfoData::class.java)!!
@@ -28,7 +28,7 @@ class InfoRepository @Inject constructor(
 
     suspend fun getSearchDataRef(): Response<DatabaseReference> {
         return try {
-            val ref = rtdb.reference.child(Constants.POKEMON_INFO+locale)
+            val ref = rtdb.reference.child(Constants.POKEMON_INFO)
             Response.Success(ref)
         }catch(e:Exception){
             Response.Failure(e)

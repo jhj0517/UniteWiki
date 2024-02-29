@@ -17,10 +17,9 @@ class InfoRepository @Inject constructor(
 
     private val locale = localeStore.findLocale()
 
-    suspend fun fetchInfo(): Response<DataSnapshot> {
+    suspend fun fetchInfoSnapshot(): Response<DataSnapshot> {
         return try {
             val info = rtdb.reference.child(Constants.POKEMON_INFO).get().await()
-            info
             Response.Success(info)
         } catch(e:Exception){
             Response.Failure(e)

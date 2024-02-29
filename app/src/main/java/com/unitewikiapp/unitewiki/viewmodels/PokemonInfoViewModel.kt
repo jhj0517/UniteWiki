@@ -49,7 +49,7 @@ class PokemonInfoViewModel @Inject constructor(
 
     private fun fetchPokemonInfo(){
         viewModelScope.launch {
-            val snapShot = repository.fetchInfo()
+            val snapShot = repository.fetchInfoSnapshot()
             when (snapShot){
                 is Response.Success -> {
                     _infoSnapshot.value = snapShot.data

@@ -45,9 +45,8 @@ class MainActivity : AppCompatActivity () {
     private val prefManager:PreferenceManager = PreferenceManager()
 
     override fun attachBaseContext(newBase: Context?) {
-        var localelang = prefManager.getString(newBase!!,"locale")
+        var localelang = prefManager.getString(newBase!!,"locale")?.lowercase()
         when(localelang){
-            "ko_KR" -> {}
             "ko_kr" -> {}
             else -> localelang = "en"
         }

@@ -12,6 +12,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.unitewikiapp.unitewiki.datas.*
 import com.unitewikiapp.unitewiki.utils.Constants
+import com.unitewikiapp.unitewiki.utils.LocaleStore
 import com.unitewikiapp.unitewiki.utils.Response
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -23,6 +24,7 @@ class PokemonInfoViewModel @Inject constructor(
     private val repository: InfoRepository,
     private val reviewRepository : ReviewRepository,
     private val auth: FirebaseAuth,
+    private val localeStore: LocaleStore
 ): ViewModel() {
 
     private val _infoSnapshot = MutableLiveData<DataSnapshot?>()
@@ -67,7 +69,7 @@ class PokemonInfoViewModel @Inject constructor(
             val data = snap.getValue(PokemonInfoData::class.java)!!
             val rank = PokemonRankData(
                 ic_pokemon = data.ic_pokemon,
-                pokemon_name = data.pokemon_name.ko,
+                pokemon_name = data.pokemon_name.localized(localeStore.findLocale()),
                 type = data.type
             )
             if (type == data.type){

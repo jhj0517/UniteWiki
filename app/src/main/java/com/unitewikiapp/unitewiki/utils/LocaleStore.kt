@@ -9,9 +9,8 @@ class LocaleStore(private val context: Context) {
     fun findLocale():String {
         val currentLocale = prefManager.getString(context,"locale")
         return when (currentLocale) {
-            "ko_KR"-> ""
-            "ko_kr" -> ""
-            else -> "EN"
+            "ko_kr" -> "ko"
+            else -> "en"
         }
     }
 

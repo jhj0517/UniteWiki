@@ -43,7 +43,7 @@ class SearchListFragment : Fragment() {
         val dataList: ArrayList<PokemonSearchData> = arrayListOf()
         viewModel.pokemondatalist.observe(viewLifecycleOwner) { result ->
 
-            val country = LocaleStore(requireActivity()).findLocale()
+            val country = LocaleStore(requireActivity()).locale!!
 
             if(!result.isNullOrEmpty()){
                 dataList.addAll(result)

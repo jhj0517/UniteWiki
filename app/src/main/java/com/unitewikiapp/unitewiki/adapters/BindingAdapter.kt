@@ -4,10 +4,14 @@ import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
 import android.view.View
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.unitewikiapp.unitewiki.R
+import com.unitewikiapp.unitewiki.datas.LocaleField
+import com.unitewikiapp.unitewiki.datas.localized
+import com.unitewikiapp.unitewiki.utils.LocaleStore
 
 @BindingAdapter("isVisible")
 fun bindIsVisible(view: View, isVisible: Boolean?) {
@@ -48,5 +52,10 @@ fun bindIsSkillSelected(view: ImageView, isSelected: Boolean?) {
     }
 }
 
+@BindingAdapter("localizedText")
+fun bindLocalized(view: TextView, localeField: LocaleField) {
+    val currentLocale = LocaleStore(view.context).locale
+    view.text = localeField.localized(currentLocale!!)
+}
 
 

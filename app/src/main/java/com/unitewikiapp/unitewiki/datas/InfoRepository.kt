@@ -1,5 +1,6 @@
 package com.unitewikiapp.unitewiki.datas
 
+import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.unitewikiapp.unitewiki.di.RealTimeDataBase
@@ -16,7 +17,16 @@ class InfoRepository @Inject constructor(
 
     private val locale = localeStore.findLocale()
 
-    suspend fun getInfoData(pokemonName:String): PokemonInfoData {
+    suspend fun fetchInfoSnapshot(): Response<DataSnapshot> {
+        return try {
+            val info = rtdb.reference.child(Constants.POKEMON_INFO).get().await()
+            Response.Success(info)
+        } catch(e:Exception){
+            Response.Failure(e)
+        }
+    }
+
+    suspend fun getInfoData(pokemonName:String): PokemonInfoData? {
         return try {
             val info:PokemonInfoData = rtdb.reference.child(Constants.POKEMON_INFO+locale).child(pokemonName).get().await()
                 .getValue(PokemonInfoData::class.java)!!
@@ -28,7 +38,7 @@ class InfoRepository @Inject constructor(
 
     suspend fun getSearchDataRef(): Response<DatabaseReference> {
         return try {
-            val ref = rtdb.reference.child(Constants.POKEMON_INFO+locale)
+            val ref = rtdb.reference.child(Constants.POKEMON_INFO)
             Response.Success(ref)
         }catch(e:Exception){
             Response.Failure(e)

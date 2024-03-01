@@ -1,6 +1,7 @@
 package com.unitewikiapp.unitewiki.viewmodels
 
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,11 +10,9 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
-import com.unitewikiapp.unitewiki.datas.InfoRepository
-import com.unitewikiapp.unitewiki.datas.PokemonInfoData
-import com.unitewikiapp.unitewiki.datas.PokemonReviewsData
-import com.unitewikiapp.unitewiki.datas.ReviewRepository
+import com.unitewikiapp.unitewiki.datas.*
 import com.unitewikiapp.unitewiki.utils.Constants
+import com.unitewikiapp.unitewiki.utils.LocaleStore
 import com.unitewikiapp.unitewiki.utils.Response
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -25,7 +24,11 @@ class PokemonInfoViewModel @Inject constructor(
     private val repository: InfoRepository,
     private val reviewRepository : ReviewRepository,
     private val auth: FirebaseAuth,
+    private val localeStore: LocaleStore
 ): ViewModel() {
+
+    private val _infoSnapshot = MutableLiveData<DataSnapshot?>()
+    val infoSnapshot: LiveData<DataSnapshot?> get() = _infoSnapshot
 
     val pokemonInfoData = MutableLiveData<PokemonInfoData>()
     val pokemonReviewData = MutableLiveData<List<PokemonReviewsData>>()
@@ -35,12 +38,47 @@ class PokemonInfoViewModel @Inject constructor(
     val secondRateSkillSet = MutableLiveData<Int>(0)
     val isCalculationComplete = MutableLiveData<Boolean>(false)
 
+    init {
+        fetchPokemonInfo()
+    }
 
-    fun fetchPokemonInfo(pokemonName: String) {
+
+    fun fetchPokemonInfoByPokemon(pokemonName: String) {
         viewModelScope.launch {
             pokemonInfoData.value = repository.getInfoData(pokemonName)
         }
     }
+
+    private fun fetchPokemonInfo(){
+        viewModelScope.launch {
+            val snapShot = repository.fetchInfoSnapshot()
+            when (snapShot){
+                is Response.Success -> {
+                    _infoSnapshot.value = snapShot.data
+                }
+                else -> {
+                    throw Exception("Failed to fetch data")
+                }
+            }
+        }
+    }
+
+    fun getPokemonRankingInfo(type: String): ArrayList<PokemonRankData>{
+        val ranksList = ArrayList<PokemonRankData>()
+        infoSnapshot.value!!.children.forEach { snap->
+            val data = snap.getValue(PokemonInfoData::class.java)!!
+            val rank = PokemonRankData(
+                ic_pokemon = data.ic_pokemon,
+                pokemon_name = data.pokemon_name.localized(localeStore.findLocale()),
+                type = data.type
+            )
+            if (type == data.type){
+                ranksList.add(rank)
+            }
+        }
+        return ranksList
+    }
+
 
     fun addReviewListener(pokemonName: String, query:String){
         viewModelScope.launch {

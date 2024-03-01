@@ -9,7 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.unitewikiapp.unitewiki.adapters.PokemonRankAdapter
 import com.unitewikiapp.unitewiki.databinding.FragmentPokemonRankBinding
-import com.unitewikiapp.unitewiki.viewmodels.PokemonRankViewModel
+import com.unitewikiapp.unitewiki.viewmodels.PokemonInfoViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -19,7 +19,7 @@ class PokemonRankFragment : Fragment() {
 
     private var _binding: FragmentPokemonRankBinding? = null
     private val binding get() = _binding!!
-    private val viewModel:PokemonRankViewModel by viewModels()
+    private val viewModel:PokemonInfoViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -47,10 +47,12 @@ class PokemonRankFragment : Fragment() {
     }
 
     private fun subscribeUi(adapter:PokemonRankAdapter, rankingType: String) {
-        viewModel.fetchRanks(rankingType)
-        viewModel.rankList.observe(viewLifecycleOwner){ res->
-            adapter.submitList(res)
-            binding.loadComplete = !(res.isNullOrEmpty())
+        viewModel.infoSnapshot.observe(viewLifecycleOwner){
+            binding.loadComplete = it != null
+            if (binding.loadComplete) {
+                val list = viewModel.getPokemonRankingInfo(rankingType)
+                adapter.submitList(list)
+            }
         }
     }
 

@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.unitewikiapp.unitewiki.adapters.PokemonRankAdapter
 import com.unitewikiapp.unitewiki.databinding.FragmentPokemonRankBinding
@@ -19,7 +19,7 @@ class PokemonRankFragment : Fragment() {
 
     private var _binding: FragmentPokemonRankBinding? = null
     private val binding get() = _binding!!
-    private val viewModel:PokemonInfoViewModel by viewModels()
+    private val viewModel:PokemonInfoViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,7 +29,7 @@ class PokemonRankFragment : Fragment() {
 
         val adapter = PokemonRankAdapter()
         binding.apply {
-            binding.rankRecyclerview.adapter = adapter
+            rankRecyclerview.adapter = adapter
             rankRecyclerview.layoutManager = LinearLayoutManager(activity)
         }
 

@@ -1,7 +1,6 @@
 package com.unitewikiapp.unitewiki.viewmodels
 
 import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -28,28 +27,23 @@ class PokemonInfoViewModel @Inject constructor(
 ): ViewModel() {
 
     private val _infoSnapshot = MutableLiveData<DataSnapshot?>()
-    val infoSnapshot: LiveData<DataSnapshot?> get() = _infoSnapshot
+    val infoSnapshot get() = _infoSnapshot
 
-    val pokemonInfoData = MutableLiveData<PokemonInfoData>()
+    private val _currentPokemon = MutableLiveData<PokemonInfoData>()
+    val currentPokemon get() = _currentPokemon
+
     val pokemonReviewData = MutableLiveData<List<PokemonReviewsData>>()
     val averageRating = MutableLiveData<Float>(0.0f)
     val reviewSize = MutableLiveData<Int>(0)
     val firstRateSkillSet = MutableLiveData<Int>(0)
     val secondRateSkillSet = MutableLiveData<Int>(0)
-    val isCalculationComplete = MutableLiveData<Boolean>(false)
+    val isCalculationComplete = MutableLiveData<Boolean>(true)
 
     init {
-        fetchPokemonInfo()
+        fetchInfoSnapshot()
     }
 
-
-    fun fetchPokemonInfoByPokemon(pokemonName: String) {
-        viewModelScope.launch {
-            pokemonInfoData.value = repository.getInfoData(pokemonName)
-        }
-    }
-
-    private fun fetchPokemonInfo(){
+    private fun fetchInfoSnapshot(){
         viewModelScope.launch {
             val snapShot = repository.fetchInfoSnapshot()
             when (snapShot){
@@ -63,13 +57,13 @@ class PokemonInfoViewModel @Inject constructor(
         }
     }
 
-    fun getPokemonRankingInfo(type: String): ArrayList<PokemonRankData>{
+    fun getRankDataByType(type: String): ArrayList<PokemonRankData>{
         val ranksList = ArrayList<PokemonRankData>()
         infoSnapshot.value!!.children.forEach { snap->
             val data = snap.getValue(PokemonInfoData::class.java)!!
             val rank = PokemonRankData(
                 ic_pokemon = data.ic_pokemon,
-                pokemon_name = data.pokemon_name.localized(localeStore.findLocale()),
+                pokemon_name = data.pokemon_name.localized(localeStore.locale!!),
                 type = data.type
             )
             if (type == data.type){
@@ -79,6 +73,15 @@ class PokemonInfoViewModel @Inject constructor(
         return ranksList
     }
 
+    fun setCurrentPokemon(name: String) {
+        infoSnapshot.value!!.children.forEach { snap ->
+            val data = snap.getValue(PokemonInfoData::class.java)!!
+            if (data.pokemon_name.localized(localeStore.locale!!) == name){
+                _currentPokemon.value = data
+                return
+            }
+        }
+    }
 
     fun addReviewListener(pokemonName: String, query:String){
         viewModelScope.launch {

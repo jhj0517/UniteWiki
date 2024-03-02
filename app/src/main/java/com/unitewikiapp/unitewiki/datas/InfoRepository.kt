@@ -26,16 +26,6 @@ class InfoRepository @Inject constructor(
         }
     }
 
-    suspend fun getInfoData(pokemonName:String): PokemonInfoData? {
-        return try {
-            val info:PokemonInfoData = rtdb.reference.child(Constants.POKEMON_INFO+locale).child(pokemonName).get().await()
-                .getValue(PokemonInfoData::class.java)!!
-            info
-        }catch(e:Exception){
-            PokemonInfoData()
-        }
-    }
-
     suspend fun getSearchDataRef(): Response<DatabaseReference> {
         return try {
             val ref = rtdb.reference.child(Constants.POKEMON_INFO)

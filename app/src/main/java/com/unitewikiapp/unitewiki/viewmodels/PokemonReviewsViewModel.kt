@@ -67,7 +67,7 @@ class PokemonReviewsViewModel @Inject constructor(
         _reviews.value = reviewsList
     }
 
-    fun sortByScore(unSorted: ArrayList<PokemonRankData>): ArrayList<PokemonRankData>{
+    fun sortPokemonByScore(unSorted: ArrayList<PokemonRankData>): ArrayList<PokemonRankData>{
         val averageScoreMap = reviews.value!!.groupBy { it.pokemon!!.localized(localeStore.locale!!) }
             .mapValues { (key, reviews) ->
                 reviews.map { it.rating }.average().toFloat()

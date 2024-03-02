@@ -14,15 +14,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!--    <ProgressBar-->
-        <!--        android:max="100"-->
-        <!--        android:id="@+id/progressbar"-->
-        <!--        android:layout_width="match_parent"-->
-        <!--        android:layout_height="2dp"-->
-        <!--        style="@style/Widget.AppCompat.ProgressBar.Horizontal"-->
-        <!--        android:progressDrawable="@drawable/custom_progressbar"-->
-        <!--        app:isGone="@{!LoadComplete}"/>-->
-
         <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="match_parent"

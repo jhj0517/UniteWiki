@@ -9,29 +9,33 @@ import androidx.activity.OnBackPressedCallback
 import androidx.core.view.isVisible
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.unitewikiapp.unitewiki.adapters.PokemonReviewInfoAdapter
 import com.unitewikiapp.unitewiki.databinding.FragmentPokemonInfoBinding
-import com.unitewikiapp.unitewiki.utils.Constants
+import com.unitewikiapp.unitewiki.datas.LocaleField
+import com.unitewikiapp.unitewiki.datas.localized
+import com.unitewikiapp.unitewiki.utils.LocaleStore
 import com.unitewikiapp.unitewiki.utils.TooltipWindow
 import com.unitewikiapp.unitewiki.viewmodels.PokemonInfoViewModel
+import com.unitewikiapp.unitewiki.viewmodels.PokemonReviewsViewModel
 import com.unitewikiapp.unitewiki.views.fragments.PokemonInfoFragment.ToolCallback
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_pokemon_info.*
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class PokemonInfoFragment : Fragment() {
 
     private lateinit var pokemonName:String
-    private val adapter = PokemonReviewInfoAdapter()
-    private val infoViewModel:PokemonInfoViewModel by viewModels()
+    private val infoViewModel:PokemonInfoViewModel by activityViewModels()
+    private val reviewViewModel:PokemonReviewsViewModel by activityViewModels()
     private lateinit var backCallBack: OnBackPressedCallback
     private lateinit var tooltip:TooltipWindow
+    @Inject
+    lateinit var localeStore:LocaleStore
 
     private var _binding: FragmentPokemonInfoBinding? = null
     private val binding get() = _binding!!
@@ -39,40 +43,30 @@ class PokemonInfoFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         pokemonName = arguments?.getString("pokemonname") ?: ""
+        infoViewModel.setCurrentPokemon(pokemonName)
     }
+
+    //3. 그러러면 랭크 화면부터 리뷰 끌어와야함.
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
         _binding = FragmentPokemonInfoBinding.inflate(inflater,container,false)
-        showToolbar()
-
+        val adapter = PokemonReviewInfoAdapter()
         binding.apply {
-            viewModel = infoViewModel
+            infoVm = infoViewModel
             lifecycleOwner = viewLifecycleOwner
-            isReviewZero = true
 
-            context?.let{
-                tooltip = TooltipWindow(it)
-                toolcallback = ToolCallback { skillName, skillCoolTime, skillDescription,view ->
-                    tooltip.setText(skillName,skillCoolTime,skillDescription)
-                    if (!tooltip.isTooltipShown()){
-                        tooltip.showToolTip(view)
-                        tooltip.showChecking(view)
-                    }
-                }
-            }
+            simpleReviewRecyclerview.adapter = adapter
+            simpleReviewRecyclerview.layoutManager = LinearLayoutManager(activity)
 
-            threeitemRecyclerview.adapter = adapter
-            threeitemRecyclerview.layoutManager = LinearLayoutManager(activity)
-            threeitemRecyclerview.setOnClickListener {
+            simpleReviewRecyclerview.setOnClickListener {
                 val direction = PokemonInfoFragmentDirections.actionPokemonInfoFragmentToPokemonReviewsFragment(
                     this@PokemonInfoFragment.pokemonName
                 )
                 navigateWithDirection(direction)
             }
-
             navigateBackbtn.setOnClickListener {
                 findNavController().popBackStack()
             }
@@ -93,7 +87,10 @@ class PokemonInfoFragment : Fragment() {
                 navigateWithDirection(direction)
             }
         }
-        subscribeUI(pokemonName)
+
+        setToolTip(binding)
+        showAppBar()
+        subscribeUI(adapter)
 
         return binding.root
     }
@@ -103,36 +100,33 @@ class PokemonInfoFragment : Fragment() {
         _binding = null
     }
 
-    private fun subscribeUI(pokemonName: String){
+    fun interface ToolCallback {
+        fun showTooltip(skillName:LocaleField, skillCoolTime:String, skillDescription:LocaleField, view:View)
+    }
 
-        runBlocking {
-            launch {
-                infoViewModel.fetchPokemonInfo(pokemonName)
-                infoViewModel.pokemonInfoData.observe(viewLifecycleOwner){ infoData->
-                    binding.apply {
-                        fullLoaded = !(infoData.ic_pokemon.isNullOrEmpty())
-                    }
+    private fun subscribeUI(adapter: PokemonReviewInfoAdapter){
+        infoViewModel.currentPokemon.observe(viewLifecycleOwner){ pokemon ->
+            if(pokemon != null){
+                binding.apply {
+                    loadComplete = true
                 }
-                infoViewModel.firstRateSkillSet.observe(viewLifecycleOwner){
-                    binding.skill1selected = it>=50 && it>0
-                }
-                infoViewModel.secondRateSkillSet.observe(viewLifecycleOwner){
-                    binding.skill3selected = it>=50 && it>0
-                }
-            }.join()
+            }
+        }
 
-            launch {
-                infoViewModel.addReviewListener(pokemonName,Constants.QUERY_LIKES_NUMBER)
-                infoViewModel.fetchRating(pokemonName)
-                infoViewModel.pokemonReviewData.observe(viewLifecycleOwner){ reviewData->
-                    binding.isReviewZero = reviewData.isNullOrEmpty()
-                    adapter.submitList(reviewData)
-                }
+        reviewViewModel.reviews.observe(viewLifecycleOwner){ review ->
+            binding.apply {
+                val name = infoViewModel.currentPokemon.value!!.pokemon_name
+                reviewCount = reviewViewModel.getReviewCount(name)
+                averageScore = reviewViewModel.getAverageScore(name)
+                val skillSelections = reviewViewModel.getSkillPreference(name)
+                lLeftArrow = skillSelections[0] >= skillSelections[1]
+                rLeftArrow = skillSelections[2] >= skillSelections[3]
+                lSkillPreference = reviewViewModel.calculatePreference(skillSelections[0], skillSelections[1])
+                rSkillPreference = reviewViewModel.calculatePreference(skillSelections[2], skillSelections[3])
 
-                infoViewModel.isCalculationComplete.observe(viewLifecycleOwner){
-                    binding.iscalculateEnd = it
-                }
-            }.join()
+                val simpleReviews = reviewViewModel.getSortedReview(name).take(3)
+                adapter.submitList(simpleReviews)
+            }
         }
     }
 
@@ -140,22 +134,35 @@ class PokemonInfoFragment : Fragment() {
         findNavController().navigate(direction)
     }
 
-    fun interface ToolCallback {
-        fun showTooltip(skillName:String, skillCoolTime:String, skillDescription:String, view:View)
+    private fun setToolTip(binding: FragmentPokemonInfoBinding){
+        binding.apply {
+            tooltip = TooltipWindow(context)
+            toolcallback = ToolCallback { skillName, skillCoolTime, skillDescription,view ->
+                tooltip.setText(
+                    skillName.localized(localeStore.locale!!),
+                    skillCoolTime,
+                    skillDescription.localized(localeStore.locale!!)
+                )
+                if (!tooltip.isTooltipShown()){
+                    tooltip.showToolTip(view)
+                    tooltip.showChecking(view)
+                }
+            }
+        }
     }
 
-    private fun showToolbar() {
-        var isToolbarShown = false
-        binding.pokemonIcIntoolbar.isVisible = isToolbarShown
-        binding.pokemonCircleIntoolbar.isVisible = isToolbarShown
+    private fun showAppBar() {
+        var isAppBarShown = false
+        binding.pokemonIcIntoolbar.isVisible = isAppBarShown
+        binding.pokemonCircleIntoolbar.isVisible = isAppBarShown
 
         binding.infoNestedscrollview.setOnScrollChangeListener(
             NestedScrollView.OnScrollChangeListener { _, _, scrollY, _, _ ->
 
                 val shouldShowToolbar = scrollY > (profile.height+10)
 
-                if (isToolbarShown != shouldShowToolbar) {
-                    isToolbarShown = shouldShowToolbar
+                if (isAppBarShown != shouldShowToolbar) {
+                    isAppBarShown = shouldShowToolbar
 
                     binding.pokemonIcIntoolbar.isVisible = shouldShowToolbar
                     binding.pokemonCircleIntoolbar.isVisible = shouldShowToolbar

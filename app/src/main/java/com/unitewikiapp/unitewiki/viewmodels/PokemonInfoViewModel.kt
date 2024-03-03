@@ -16,7 +16,6 @@ import com.unitewikiapp.unitewiki.utils.Response
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.math.roundToInt
 
 @HiltViewModel
 class PokemonInfoViewModel @Inject constructor(
@@ -138,7 +137,7 @@ class PokemonInfoViewModel @Inject constructor(
                 reviewSize.value = reviews.size
 
                 if (reviews.isNotEmpty()) {
-                    calculateReviewStats(reviews)
+                    //calculateReviewStats(reviews)
                 } else {
                     isCalculationComplete.value = true
                 }
@@ -148,26 +147,4 @@ class PokemonInfoViewModel @Inject constructor(
         })
     }
 
-    private fun calculateReviewStats(reviews: List<PokemonReviewsData>) {
-        val ratings = reviews.map { it.rating }
-        val firstSkill = reviews.map { it.firstSkillSetRate }
-        val secondSkill = reviews.map { it.secondSkillSetRate }
-
-        averageRating.value = ratings.average().round(1)
-        firstRateSkillSet.value = firstSkill.average().percent()
-        secondRateSkillSet.value = secondSkill.average().percent()
-
-        isCalculationComplete.value = true
-    }
-
-}
-
-private fun Double.round(decimals: Int): Float {
-    var multiplier = 1.0
-    repeat(decimals) { multiplier *= 10 }
-    return (this * multiplier).roundToInt() / multiplier.toFloat()
-}
-
-private fun Double.percent(): Int {
-    return ((1 - this) * 100).toInt()
 }

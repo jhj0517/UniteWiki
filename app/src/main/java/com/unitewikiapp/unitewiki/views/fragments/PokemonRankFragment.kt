@@ -59,7 +59,7 @@ class PokemonRankFragment : Fragment() {
             if (reviewSnap != null && infoSnap != null){
                 binding.loadComplete = true
                 val unsorted = infoViewModel.getRankDataByType(rankingType)
-                val sorted = reviewViewModel.sortByScore(unsorted)
+                val sorted = reviewViewModel.sortPokemonByScore(unsorted)
                 adapter.submitList(sorted)
             }
         }

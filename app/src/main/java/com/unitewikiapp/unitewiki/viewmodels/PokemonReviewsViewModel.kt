@@ -9,10 +9,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.getValue
-import com.unitewikiapp.unitewiki.datas.PokemonRankData
-import com.unitewikiapp.unitewiki.datas.PokemonReviewsData
-import com.unitewikiapp.unitewiki.datas.ReviewRepository
-import com.unitewikiapp.unitewiki.datas.localized
+import com.unitewikiapp.unitewiki.datas.*
 import com.unitewikiapp.unitewiki.utils.Constants
 import com.unitewikiapp.unitewiki.utils.LocaleStore
 import com.unitewikiapp.unitewiki.utils.Response
@@ -79,6 +76,48 @@ class PokemonReviewsViewModel @Inject constructor(
             }
         }.sortedByDescending { it.average_rating }
         return ArrayList(updatedRanks)
+    }
+
+    fun getReviewCount(pokemonName: LocaleField): Int{
+        return reviews.value!!.count {
+            it.pokemon!!.localized(localeStore.locale!!) == pokemonName.localized(localeStore.locale!!)
+        }
+    }
+
+    fun getAverageScore(pokemonName: LocaleField): Float {
+        val averageScoreMap = reviews.value!!.groupBy {
+            it.pokemon!!.localized(localeStore.locale!!)
+        }.mapValues { (key, reviews) ->
+            reviews.map { it.rating }.average().toFloat()
+        }
+        val averageScore = averageScoreMap[pokemonName.localized(localeStore.locale!!)] ?: 0.0f
+        return Math.round(averageScore*10)/10.0f
+    }
+
+    fun getSkillPreference(pokemonName: LocaleField):ArrayList<Int>  {
+        val counts = ArrayList(listOf(0, 0, 0, 0))
+        val _review = reviews.value!!.filter {
+            it.pokemon!!.localized(localeStore.locale!!) == pokemonName.localized(localeStore.locale!!)
+        }
+        _review.forEach { review ->
+            val parts = review.selectedSkills.split(",").map { it.toInt() }
+            val firstNum = parts[0]
+            val secondNum = parts[1]
+
+            counts[firstNum-1] += 1
+            counts[secondNum+1] += 1
+        }
+        return counts
+    }
+
+    fun calculatePreference(a: Int, b: Int):Int{
+        if(a==0 && b==0){
+            return 0
+        }
+        if(a==b){
+            return 50
+        }
+        return Math.max(a/(a+b),b/(a+b))*100
     }
 
     fun setReportTrue(pokemonName: String, uid:String, uidOfWriter:String){

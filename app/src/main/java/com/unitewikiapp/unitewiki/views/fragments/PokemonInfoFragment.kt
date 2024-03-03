@@ -46,8 +46,6 @@ class PokemonInfoFragment : Fragment() {
         infoViewModel.setCurrentPokemon(pokemonName)
     }
 
-    //1. 스킬 선택율 계산
-    //2. 리뷰데이터 끌어온걸로 상위 3개만 표시.
     //3. 그러러면 랭크 화면부터 리뷰 끌어와야함.
 
     override fun onCreateView(
@@ -92,7 +90,7 @@ class PokemonInfoFragment : Fragment() {
 
         setToolTip(binding)
         showAppBar()
-        subscribeUI(adapter, pokemonName)
+        subscribeUI(adapter)
 
         return binding.root
     }
@@ -106,7 +104,7 @@ class PokemonInfoFragment : Fragment() {
         fun showTooltip(skillName:LocaleField, skillCoolTime:String, skillDescription:LocaleField, view:View)
     }
 
-    private fun subscribeUI(adapter: PokemonReviewInfoAdapter, pokemonName: String){
+    private fun subscribeUI(adapter: PokemonReviewInfoAdapter){
         infoViewModel.currentPokemon.observe(viewLifecycleOwner){ pokemon ->
             if(pokemon != null){
                 binding.apply {
@@ -125,6 +123,9 @@ class PokemonInfoFragment : Fragment() {
                 rLeftArrow = skillSelections[2] >= skillSelections[3]
                 lSkillPreference = reviewViewModel.calculatePreference(skillSelections[0], skillSelections[1])
                 rSkillPreference = reviewViewModel.calculatePreference(skillSelections[2], skillSelections[3])
+
+                val simpleReviews = reviewViewModel.getSortedReview(name).take(3)
+                adapter.submitList(simpleReviews)
             }
         }
     }

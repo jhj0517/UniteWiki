@@ -110,6 +110,12 @@ class PokemonReviewsViewModel @Inject constructor(
         return counts
     }
 
+    fun getSortedReview(pokemonName: LocaleField):List<PokemonReviewsData>{
+        return reviews.value!!.filter {
+            it.pokemon!!.localized(localeStore.locale!!) == pokemonName.localized(localeStore.locale!!)
+        }.sortedByDescending { it.likes.size }
+    }
+
     fun calculatePreference(a: Int, b: Int):Int{
         if(a==0 && b==0){
             return 0

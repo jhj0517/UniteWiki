@@ -74,11 +74,14 @@ class PokemonReviewsAdapter (
     }
 
     private fun updateLikeLocally(position: Int, itemData:PokemonReviewsData?, likeView:ImageView){
+        if (currentUser == null){
+            return
+        }
         itemData!!.isLiked = !itemData.isLiked!!
         if(itemData.isLiked!!){
-            itemData.likes[currentUser?.uid ?:"_"] = itemData.isLiked!!
+            itemData.likes[currentUser.uid] = itemData.isLiked!!
         } else {
-            itemData.likes.remove(currentUser?.uid ?: "_")
+            itemData.likes.remove(currentUser.uid)
         }
     }
 

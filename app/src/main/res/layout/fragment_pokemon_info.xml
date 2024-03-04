@@ -551,9 +551,7 @@
                 android:paddingBottom="20dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:clickable="true"
                 app:isVisible="@{ReviewCount!=0}"/>
-
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

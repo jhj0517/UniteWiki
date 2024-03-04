@@ -5,9 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.*
 import com.google.firebase.database.ktx.getValue
 import com.unitewikiapp.unitewiki.datas.*
 import com.unitewikiapp.unitewiki.utils.Constants
@@ -51,17 +50,6 @@ class PokemonReviewsViewModel @Inject constructor(
                 }
             }
         }
-    }
-
-    fun setReviews(){
-        val reviewsList = ArrayList<PokemonReviewsData>()
-        reviewSnapshot.value!!.children.forEach{ pokemonSnap->
-            pokemonSnap.children.forEach { reviewSnap ->
-                val data = reviewSnap.getValue(PokemonReviewsData::class.java)!!
-                reviewsList.add(data)
-            }
-        }
-        _reviews.value = reviewsList
     }
 
     fun sortPokemonByScore(unSorted: ArrayList<PokemonRankData>): ArrayList<PokemonRankData>{
@@ -126,6 +114,40 @@ class PokemonReviewsViewModel @Inject constructor(
         return Math.max(a/(a+b),b/(a+b))*100
     }
 
+    fun updateLike(
+        review: PokemonReviewsData,
+        currentUser: FirebaseUser
+    ){
+        viewModelScope.launch {
+            val ref = repository.fetchReviewReference(review)
+            if(ref is Response.Success){
+                ref.data.runTransaction(object : Transaction.Handler {
+                    override fun doTransaction(mutableData: MutableData): Transaction.Result {
+                        val p = mutableData.getValue(PokemonReviewsData::class.java)
+                            ?: return Transaction.success(mutableData)
+
+                        if (p.likes.containsKey(currentUser.uid)) {
+                            p.likes.remove(currentUser.uid)
+                        } else {
+                            p.likes[currentUser.uid] = true
+                        }
+
+                        mutableData.value = p
+                        return Transaction.success(mutableData)
+                    }
+
+                    override fun onComplete(
+                        databaseError: DatabaseError?,
+                        committed: Boolean,
+                        currentData: DataSnapshot?
+                    ) { }
+                })
+            } else {
+                throw Exception("Failed to update Like")
+            }
+        }
+    }
+
     fun setReportTrue(pokemonName: String, uid:String, uidOfWriter:String){
         viewModelScope.launch {
             val reportRef = repository.getQueryForReport(pokemonName,uid,uidOfWriter)
@@ -137,41 +159,16 @@ class PokemonReviewsViewModel @Inject constructor(
         }
     }
 
-//    fun onLikeClicked(pokemonName: String, myUid:String, uidOfWriter:String) {
-//        viewModelScope.launch {
-//            val ref = repository.getQueryForMyReview(pokemonName,uidOfWriter)
-//            if(ref is Response.Success){
-//            ref.data.runTransaction(object : Transaction.Handler {
-//                override fun doTransaction(mutableData: MutableData): Transaction.Result {
-//                    val p = mutableData.getValue(PokemonReviewsData::class.java)
-//                        ?: return Transaction.success(mutableData)
-//
-//                    if (p.likes.containsKey(myUid)) {
-//                        // Unstar the post and remove self from stars
-//                        p.likesNumber = p.likesNumber - 1
-//                        p.likes.remove(myUid)
-//                    } else {
-//                        // Star the post and add self to stars
-//                        p.likesNumber = p.likesNumber + 1
-//                        p.likes[myUid] = true
-//                    }
-//
-//                    // Set value and report transaction success
-//                    mutableData.value = p
-//                    return Transaction.success(mutableData)
-//                }
-//
-//                override fun onComplete(
-//                    databaseError: DatabaseError?,
-//                    committed: Boolean,
-//                    currentData: DataSnapshot?
-//                ) { }
-//            })
-//            } else {
-//                Log.d("Error during REALTIME_DB", " Query Error" )
-//            }
-//        }
-//    }
+    fun setReviews(){
+        val reviewsList = ArrayList<PokemonReviewsData>()
+        reviewSnapshot.value!!.children.forEach{ pokemonSnap->
+            pokemonSnap.children.forEach { reviewSnap ->
+                val data = reviewSnap.getValue(PokemonReviewsData::class.java)!!
+                reviewsList.add(data)
+            }
+        }
+        _reviews.value = reviewsList
+    }
 
     fun removeMyReview(pokemonName: String, uid:String){
         viewModelScope.launch {

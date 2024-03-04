@@ -177,7 +177,12 @@ class PokemonInfoFragment : Fragment(), PokemonReviewsAdapter.ClickCallback {
         itemData: PokemonReviewsData?,
         likeView: ImageView
     ) {
-
+        val user = authViewModel.currentUser.value
+        if(user == null){
+            authViewModel.signIn(requireActivity())
+            return
+        }
+        reviewViewModel.updateLike(itemData!!, user)
     }
 
     override fun onClickPopupEditMenu(

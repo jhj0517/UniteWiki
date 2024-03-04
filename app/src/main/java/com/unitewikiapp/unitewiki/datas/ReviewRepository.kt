@@ -29,6 +29,16 @@ class ReviewRepository @Inject constructor(
         }
     }
 
+    suspend fun fetchReviewReference(review: PokemonReviewsData): Response<DatabaseReference>{
+        return try {
+            val ref = rtdb.reference.child(Constants.POKEMON_REVIEW+"_"+localeStore.locale!!)
+                .child(review.pokemon!!.en).child(review.uid!!)
+            Response.Success(ref)
+        } catch (e:Exception){
+            Response.Failure(e)
+        }
+    }
+
     suspend fun getMyReviewRef(pokemonName:String, myUid:String): Response<DatabaseReference> {
         return try{
             val ref = rtdb.reference.child(Constants.POKEMON_REVIEW+locale).child(pokemonName)

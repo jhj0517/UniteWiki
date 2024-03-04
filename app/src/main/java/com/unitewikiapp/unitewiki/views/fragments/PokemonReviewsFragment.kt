@@ -17,23 +17,28 @@ import com.unitewikiapp.unitewiki.adapters.PokemonReviewsAdapter
 import com.unitewikiapp.unitewiki.databinding.FragmentPokemonReviewsBinding
 import com.unitewikiapp.unitewiki.datas.PokemonReviewsData
 import com.unitewikiapp.unitewiki.utils.Constants
+import com.unitewikiapp.unitewiki.utils.LocaleStore
 import com.unitewikiapp.unitewiki.utils.ShortPopupWindow
 import com.unitewikiapp.unitewiki.viewmodels.LoginViewModel
 import com.unitewikiapp.unitewiki.viewmodels.PokemonReviewsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class PokemonReviewsFragment : Fragment(), PokemonReviewsAdapter.ClickCallback{
 
     private lateinit var pokemonName:String
-    private val reviewsAdapter = PokemonReviewsAdapter(false,this)
-    private val myReviewAdapter = PokemonReviewsAdapter(true,this)
     private val viewModel:PokemonReviewsViewModel by viewModels()
     private val loginViewModel:LoginViewModel by activityViewModels()
+    private val reviewsAdapter = PokemonReviewsAdapter(false,this, localeStore, loginViewModel.currentUser.value)
+    private val myReviewAdapter = PokemonReviewsAdapter(true,this, localeStore, loginViewModel.currentUser.value)
     private var _binding:FragmentPokemonReviewsBinding? = null
     private val binding get() = _binding!!
+
+    @Inject
+    lateinit var localeStore: LocaleStore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,13 +88,12 @@ class PokemonReviewsFragment : Fragment(), PokemonReviewsAdapter.ClickCallback{
                         R.id.sortbylikes-> {removeReviewsListener()
                                             addReviewsListeners(Constants.QUERY_LIKES_NUMBER)}
                         R.id.sortbyrecent->{ removeReviewsListener()
-                                            addReviewsListeners(Constants.QUERY_TIME)}
+                                            addReviewsListeners(Constants.QUERY_TIME) }
                     }
                     false
                 }
                 pop.show()
             }
-
         }
 
         }
@@ -129,16 +133,16 @@ class PokemonReviewsFragment : Fragment(), PokemonReviewsAdapter.ClickCallback{
     }
 
     override fun onClickLikeButton(position:Int, itemData:PokemonReviewsData?, likeView:ImageView) {
-        val user = loginViewModel.getUser().value
+        val user = loginViewModel.currentUser.value
         if(user != null){
-            viewModel.onLikeClicked(pokemonName,user.uid,itemData!!.uid!!)
+            //viewModel.onLikeClicked(pokemonName,user.uid,itemData!!.uid!!)
         } else{
             loginViewModel.signIn(requireActivity())
         }
     }
 
     override fun onClickPopupEditMenu(position: Int, itemData: PokemonReviewsData?, anchor: ImageView) {
-        val user = loginViewModel.getUser().value
+        val user = loginViewModel.currentUser.value
         var pop = PopupMenu(context,anchor)
         pop.inflate(R.menu.edit_menu)
 
@@ -171,7 +175,7 @@ class PokemonReviewsFragment : Fragment(), PokemonReviewsAdapter.ClickCallback{
     }
 
     override fun onClickPopupReportMenu(position: Int, itemData:PokemonReviewsData?, anchor:ImageView) {
-        val user = loginViewModel.getUser().value
+        val user = loginViewModel.currentUser.value
         val pop = PopupMenu(context,anchor)
         pop.inflate(R.menu.report_menu)
         pop.setOnMenuItemClickListener { item->
@@ -199,7 +203,7 @@ class PokemonReviewsFragment : Fragment(), PokemonReviewsAdapter.ClickCallback{
     }
 
     private fun navigateAfterLoginCheck(){
-        val user = loginViewModel.getUser().value
+        val user = loginViewModel.currentUser.value
         if(user?.uid!=null){
             val direction = PokemonReviewsFragmentDirections.actionPokemonReviewsFragmentToReviewWritingFragment(pokemonName,false)
             findNavController().navigate(direction)

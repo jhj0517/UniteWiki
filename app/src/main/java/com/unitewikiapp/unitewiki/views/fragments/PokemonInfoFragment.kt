@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.activity.OnBackPressedCallback
 import androidx.core.view.isVisible
 import androidx.core.widget.NestedScrollView
@@ -13,12 +14,14 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.unitewikiapp.unitewiki.adapters.PokemonReviewInfoAdapter
+import com.unitewikiapp.unitewiki.adapters.PokemonReviewsAdapter
 import com.unitewikiapp.unitewiki.databinding.FragmentPokemonInfoBinding
 import com.unitewikiapp.unitewiki.datas.LocaleField
+import com.unitewikiapp.unitewiki.datas.PokemonReviewsData
 import com.unitewikiapp.unitewiki.datas.localized
 import com.unitewikiapp.unitewiki.utils.LocaleStore
 import com.unitewikiapp.unitewiki.utils.TooltipWindow
+import com.unitewikiapp.unitewiki.viewmodels.LoginViewModel
 import com.unitewikiapp.unitewiki.viewmodels.PokemonInfoViewModel
 import com.unitewikiapp.unitewiki.viewmodels.PokemonReviewsViewModel
 import com.unitewikiapp.unitewiki.views.fragments.PokemonInfoFragment.ToolCallback
@@ -27,11 +30,12 @@ import kotlinx.android.synthetic.main.fragment_pokemon_info.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class PokemonInfoFragment : Fragment() {
+class PokemonInfoFragment : Fragment(), PokemonReviewsAdapter.ClickCallback {
 
     private lateinit var pokemonName:String
     private val infoViewModel:PokemonInfoViewModel by activityViewModels()
     private val reviewViewModel:PokemonReviewsViewModel by activityViewModels()
+    private val authViewModel:LoginViewModel by activityViewModels()
     private lateinit var backCallBack: OnBackPressedCallback
     private lateinit var tooltip:TooltipWindow
     @Inject
@@ -46,14 +50,15 @@ class PokemonInfoFragment : Fragment() {
         infoViewModel.setCurrentPokemon(pokemonName)
     }
 
-    //3. 그러러면 랭크 화면부터 리뷰 끌어와야함.
+    //4. 리사이클러뷰 어댑터 손보기
+    //5. 로그인 손대기
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
         _binding = FragmentPokemonInfoBinding.inflate(inflater,container,false)
-        val adapter = PokemonReviewInfoAdapter()
+        val adapter = PokemonReviewsAdapter(false, this, localeStore, authViewModel.currentUser.value)
         binding.apply {
             infoVm = infoViewModel
             lifecycleOwner = viewLifecycleOwner
@@ -104,13 +109,9 @@ class PokemonInfoFragment : Fragment() {
         fun showTooltip(skillName:LocaleField, skillCoolTime:String, skillDescription:LocaleField, view:View)
     }
 
-    private fun subscribeUI(adapter: PokemonReviewInfoAdapter){
+    private fun subscribeUI(adapter: PokemonReviewsAdapter){
         infoViewModel.currentPokemon.observe(viewLifecycleOwner){ pokemon ->
-            if(pokemon != null){
-                binding.apply {
-                    loadComplete = true
-                }
-            }
+            binding.loadComplete = pokemon != null
         }
 
         reviewViewModel.reviews.observe(viewLifecycleOwner){ review ->
@@ -169,6 +170,35 @@ class PokemonInfoFragment : Fragment() {
                 }
             }
         )
+    }
+
+    override fun onClickLikeButton(
+        position: Int,
+        itemData: PokemonReviewsData?,
+        likeView: ImageView
+    ) {
+        val user = authViewModel.currentUser.value
+        if(user == null){
+            authViewModel.signIn(requireActivity())
+            return
+        }
+        reviewViewModel.updateLike(itemData!!, user)
+    }
+
+    override fun onClickPopupEditMenu(
+        position: Int,
+        itemData: PokemonReviewsData?,
+        anchor: ImageView
+    ) {
+
+    }
+
+    override fun onClickPopupReportMenu(
+        position: Int,
+        itemData: PokemonReviewsData?,
+        anchor: ImageView
+    ) {
+
     }
 
     override fun onAttach(context: Context) {

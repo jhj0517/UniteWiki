@@ -6,11 +6,18 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseUser
 import com.unitewikiapp.unitewiki.databinding.ItemPokemonReveiwsBinding
 import com.unitewikiapp.unitewiki.datas.PokemonReviewsData
+import com.unitewikiapp.unitewiki.utils.LocaleStore
 import com.unitewikiapp.unitewiki.viewmodels.PokemonReviewAdapterViewModel
 
-class PokemonReviewsAdapter (private val isMyReview: Boolean, val clickCallBack:ClickCallback):
+class PokemonReviewsAdapter (
+    private val isMyReview: Boolean,
+    private val clickCallBack: ClickCallback,
+    private val localeStore: LocaleStore,
+    private val currentUser: FirebaseUser?
+    ):
     ListAdapter<PokemonReviewsData, PokemonReviewsAdapter.ReviewViewHolder>(diffUtil){
 
     interface ClickCallback{
@@ -32,7 +39,7 @@ class PokemonReviewsAdapter (private val isMyReview: Boolean, val clickCallBack:
 
         fun reviewBind(items: PokemonReviewsData) {
             with(reviewBinding){
-                viewModel = PokemonReviewAdapterViewModel(items)
+                viewModel = PokemonReviewAdapterViewModel(items, localeStore)
                 executePendingBindings()
                 isLiked = items.isLiked!!
                 isEdited = items.edited
@@ -60,7 +67,21 @@ class PokemonReviewsAdapter (private val isMyReview: Boolean, val clickCallBack:
 
             reviewBinding.layoutLike.setOnClickListener {
                 clickCallBack.onClickLikeButton(bindingAdapterPosition, getItem(bindingAdapterPosition), reviewBinding.icLike)
+                updateLikeLocally(bindingAdapterPosition, getItem(bindingAdapterPosition), reviewBinding.icLike)
+                notifyItemChanged(bindingAdapterPosition)
             }
+        }
+    }
+
+    private fun updateLikeLocally(position: Int, itemData:PokemonReviewsData?, likeView:ImageView){
+        if (currentUser == null){
+            return
+        }
+        itemData!!.isLiked = !itemData.isLiked!!
+        if(itemData.isLiked!!){
+            itemData.likes[currentUser.uid] = itemData.isLiked!!
+        } else {
+            itemData.likes.remove(currentUser.uid)
         }
     }
 

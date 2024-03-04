@@ -5,7 +5,6 @@ import android.app.ProgressDialog
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.firebase.ui.auth.AuthUI
@@ -29,12 +28,8 @@ class LoginViewModel @Inject constructor(
     private val authUI:AuthUI
 ):ViewModel(){
 
-    private val currentUser: MutableLiveData<FirebaseUser> = MutableLiveData(auth.currentUser)
-    val _currentUser:LiveData<FirebaseUser> = currentUser
-
-    fun getUser():MutableLiveData<FirebaseUser>{
-        return currentUser
-    }
+    private val _currentUser: MutableLiveData<FirebaseUser?> = MutableLiveData(auth.currentUser)
+    val currentUser get() = _currentUser
 
     fun signIn(context:Activity){
         val signInIntent = googleSignInClient.signInIntent

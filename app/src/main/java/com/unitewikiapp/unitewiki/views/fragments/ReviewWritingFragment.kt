@@ -60,7 +60,7 @@ class ReviewWritingFragment : Fragment()
                 if(viewmodel.firstClickState.value==null || viewmodel.secondClickState.value==null){
                     selectDialog.show(requireActivity().supportFragmentManager,"dialog")
                 }else{
-                    val user = loginViewModel.getUser()
+                    val user = loginViewModel.currentUser
                     val data = PokemonReviewWritingData(
                         pokemon=pokemonname,
                         writing = reviewWriting.text.toString(),
@@ -94,7 +94,7 @@ class ReviewWritingFragment : Fragment()
         viewmodel.fetchInfo(pokemonName)
         when (isEditing) {
             true -> {
-                val user = loginViewModel.getUser().value
+                val user = loginViewModel.currentUser.value
                 viewmodel.fetchMyReviewText(pokemonName,user!!.uid)
                 viewmodel.myReview.observe(viewLifecycleOwner){
                     binding.reviewWriting.setText(it)

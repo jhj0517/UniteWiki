@@ -37,7 +37,7 @@ class SettingFragment : Fragment(), LanguageDialogFragment.OnLanguageSelected {
     ): View? {
         _binding = FragmentSettingBinding.inflate(inflater,container,false)
         binding.apply {
-            loginViewModel.getUser().observe(viewLifecycleOwner){
+            loginViewModel.currentUser.observe(viewLifecycleOwner){
                 when(it){
                     null -> isSignedIn = false
                     else -> {isSignedIn = true

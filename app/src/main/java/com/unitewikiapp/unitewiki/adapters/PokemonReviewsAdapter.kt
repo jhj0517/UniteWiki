@@ -14,9 +14,9 @@ import com.unitewikiapp.unitewiki.viewmodels.PokemonReviewAdapterViewModel
 
 class PokemonReviewsAdapter (
     private val isMyReview: Boolean,
-    val clickCallBack: ClickCallback,
-    val localeStore: LocaleStore,
-    val currentUser: FirebaseUser?
+    private val clickCallBack: ClickCallback,
+    private val localeStore: LocaleStore,
+    private val currentUser: FirebaseUser?
     ):
     ListAdapter<PokemonReviewsData, PokemonReviewsAdapter.ReviewViewHolder>(diffUtil){
 

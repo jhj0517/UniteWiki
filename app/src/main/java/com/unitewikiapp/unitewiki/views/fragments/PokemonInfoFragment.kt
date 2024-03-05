@@ -84,10 +84,7 @@ class PokemonInfoFragment : Fragment(),
                 navigateWithDirection(direction)
             }
             reviewNavigationButton.setOnClickListener {
-                val direction = PokemonInfoFragmentDirections.actionPokemonInfoFragmentToPokemonReviewsFragment(
-                    this@PokemonInfoFragment.pokemonName
-                )
-                navigateWithDirection(direction)
+                reviewViewModel.fetchReviewSnapshot()
             }
             NoReviewIndicator.setOnClickListener {
                 val direction = PokemonInfoFragmentDirections.actionPokemonInfoFragmentToPokemonReviewsFragment(
@@ -118,7 +115,8 @@ class PokemonInfoFragment : Fragment(),
             binding.loadComplete = pokemon != null
         }
 
-        reviewViewModel.reviews.observe(viewLifecycleOwner){ review ->
+        reviewViewModel.reviewSnapshot.observe(viewLifecycleOwner){ review ->
+            reviewViewModel.setCurrentReviews()
             binding.apply {
                 val name = infoViewModel.currentPokemon.value!!.pokemon_name
                 reviewCount = reviewViewModel.getReviewCount(name)
@@ -129,7 +127,13 @@ class PokemonInfoFragment : Fragment(),
                 lSkillPreference = reviewViewModel.calculatePreference(skillSelections[0], skillSelections[1])
                 rSkillPreference = reviewViewModel.calculatePreference(skillSelections[2], skillSelections[3])
 
-                val simpleReviews = reviewViewModel.getSortedReview(name).take(3)
+                var simpleReviews = reviewViewModel.getSortedReview(name).take(3)
+                if(authViewModel.currentUser.value!=null) {
+                    simpleReviews = reviewViewModel.filterReportedReview(
+                        simpleReviews,
+                        authViewModel.currentUser.value!!
+                    )
+                }
                 adapter.submitList(simpleReviews)
             }
         }
@@ -221,10 +225,10 @@ class PokemonInfoFragment : Fragment(),
                 findNavController().navigate(direction)
             }
             R.id.delete -> {
-                reviewViewModel.removeReview(itemData!!, authViewModel.currentUser.value!!)
+                reviewViewModel.removeReview(itemData!!)
             }
             R.id.report -> {
-                reviewViewModel.reportReview(itemData!!)
+                reviewViewModel.reportReview(itemData!!, authViewModel.currentUser.value!!)
             }
         }
     }

@@ -14,12 +14,14 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.unitewikiapp.unitewiki.R
 import com.unitewikiapp.unitewiki.adapters.PokemonReviewsAdapter
 import com.unitewikiapp.unitewiki.databinding.FragmentPokemonInfoBinding
 import com.unitewikiapp.unitewiki.datas.LocaleField
 import com.unitewikiapp.unitewiki.datas.PokemonReviewsData
 import com.unitewikiapp.unitewiki.datas.localized
 import com.unitewikiapp.unitewiki.utils.LocaleStore
+import com.unitewikiapp.unitewiki.utils.ReviewPopup
 import com.unitewikiapp.unitewiki.utils.TooltipWindow
 import com.unitewikiapp.unitewiki.viewmodels.LoginViewModel
 import com.unitewikiapp.unitewiki.viewmodels.PokemonInfoViewModel
@@ -30,7 +32,9 @@ import kotlinx.android.synthetic.main.fragment_pokemon_info.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class PokemonInfoFragment : Fragment(), PokemonReviewsAdapter.ClickCallback {
+class PokemonInfoFragment : Fragment(),
+    PokemonReviewsAdapter.ClickCallback,
+    ReviewPopup.ClickCallback {
 
     private lateinit var pokemonName:String
     private val infoViewModel:PokemonInfoViewModel by activityViewModels()
@@ -185,20 +189,44 @@ class PokemonInfoFragment : Fragment(), PokemonReviewsAdapter.ClickCallback {
         reviewViewModel.updateLike(itemData!!, user)
     }
 
-    override fun onClickPopupEditMenu(
+    override fun onClickPopupMenu(
         position: Int,
         itemData: PokemonReviewsData?,
         anchor: ImageView
     ) {
-
+        val user = authViewModel.currentUser.value
+        if (user==null){
+            authViewModel.signIn(requireActivity())
+            return
+        }
+        val menu:Int = if (itemData!!.uid==user.uid){
+            R.menu.edit_menu
+        } else {
+            R.menu.report_menu
+        }
+        ReviewPopup.showMenu(
+            context = requireActivity(),
+            anchor = anchor,
+            menuRes = menu,
+            review = itemData,
+            position = position,
+            clickCallback = this
+        )
     }
 
-    override fun onClickPopupReportMenu(
-        position: Int,
-        itemData: PokemonReviewsData?,
-        anchor: ImageView
-    ) {
-
+    override fun onPopupMenuItemClick(itemId: Int, position:Int, itemData: PokemonReviewsData?, anchor: View){
+        when (itemId) {
+            R.id.edit -> {
+                val direction = PokemonReviewsFragmentDirections.actionPokemonReviewsFragmentToReviewWritingFragment(pokemonName,true)
+                findNavController().navigate(direction)
+            }
+            R.id.delete -> {
+                reviewViewModel.removeReview(itemData!!, authViewModel.currentUser.value!!)
+            }
+            R.id.report -> {
+                reviewViewModel.reportReview(itemData!!)
+            }
+        }
     }
 
     override fun onAttach(context: Context) {

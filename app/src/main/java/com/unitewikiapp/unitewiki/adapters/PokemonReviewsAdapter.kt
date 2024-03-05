@@ -21,8 +21,7 @@ class PokemonReviewsAdapter (
     ListAdapter<PokemonReviewsData, PokemonReviewsAdapter.ReviewViewHolder>(diffUtil){
 
     interface ClickCallback{
-        fun onClickPopupEditMenu(position: Int, itemData:PokemonReviewsData?, anchor:ImageView)
-        fun onClickPopupReportMenu(position: Int, itemData:PokemonReviewsData?, anchor:ImageView)
+        fun onClickPopupMenu(position: Int, itemData:PokemonReviewsData?, anchor:ImageView)
         fun onClickLikeButton(position: Int, itemData:PokemonReviewsData?, likeView:ImageView)
     }
 
@@ -41,7 +40,7 @@ class PokemonReviewsAdapter (
             with(reviewBinding){
                 viewModel = PokemonReviewAdapterViewModel(items, localeStore)
                 executePendingBindings()
-                isLiked = items.isLiked!!
+                isLiked = items.likes.containsKey(currentUser?.uid)
                 isEdited = items.edited
             }
         }
@@ -58,11 +57,7 @@ class PokemonReviewsAdapter (
             }
 
             reviewBinding.reportMenuRoot.setOnClickListener {
-                if (isMyReview) {
-                    clickCallBack.onClickPopupEditMenu(bindingAdapterPosition, getItem(bindingAdapterPosition), reviewBinding.reportMenu)
-                } else {
-                    clickCallBack.onClickPopupReportMenu(bindingAdapterPosition, getItem(bindingAdapterPosition), reviewBinding.reportMenu)
-                }
+                clickCallBack.onClickPopupMenu(bindingAdapterPosition, getItem(bindingAdapterPosition), reviewBinding.reportMenu)
             }
 
             reviewBinding.layoutLike.setOnClickListener {
@@ -77,11 +72,10 @@ class PokemonReviewsAdapter (
         if (currentUser == null){
             return
         }
-        itemData!!.isLiked = !itemData.isLiked!!
-        if(itemData.isLiked!!){
-            itemData.likes[currentUser.uid] = itemData.isLiked!!
-        } else {
+        if (itemData!!.likes.containsKey(currentUser.uid)){
             itemData.likes.remove(currentUser.uid)
+        } else {
+            itemData.likes[currentUser.uid] = true
         }
     }
 

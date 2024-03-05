@@ -31,14 +31,14 @@ class PokemonReviewsViewModel @Inject constructor(
     private val _reviewSnapshot = MutableLiveData<DataSnapshot?>()
     val reviewSnapshot get() = _reviewSnapshot
 
-    private val _reviews = MutableLiveData<List<PokemonReviewsData>>()
-    val reviews get() = _reviews
+    private val _currentReviews = MutableLiveData<List<PokemonReviewsData>>()
+    val currentReviews get() = _currentReviews
 
     init {
         fetchReviewSnapshot()
     }
 
-    private fun fetchReviewSnapshot(){
+    fun fetchReviewSnapshot(){
         viewModelScope.launch {
             val snapShot = repository.fetchReviewSnapshot()
             when (snapShot){
@@ -52,8 +52,20 @@ class PokemonReviewsViewModel @Inject constructor(
         }
     }
 
+    fun setCurrentReviews(){
+        val reviewsList = ArrayList<PokemonReviewsData>()
+        reviewSnapshot.value!!.children.forEach{ pokemonSnap->
+            pokemonSnap.children.forEach { reviewSnap ->
+                val data = reviewSnap.getValue(PokemonReviewsData::class.java)!!
+                reviewsList.add(data)
+            }
+        }
+        _currentReviews.value = reviewsList
+    }
+
+
     fun sortPokemonByScore(unSorted: ArrayList<PokemonRankData>): ArrayList<PokemonRankData>{
-        val averageScoreMap = reviews.value!!.groupBy { it.pokemon!!.localized(localeStore.locale!!) }
+        val averageScoreMap = currentReviews.value!!.groupBy { it.pokemon!!.localized(localeStore.locale!!) }
             .mapValues { (key, reviews) ->
                 reviews.map { it.rating }.average().toFloat()
             }
@@ -67,13 +79,13 @@ class PokemonReviewsViewModel @Inject constructor(
     }
 
     fun getReviewCount(pokemonName: LocaleField): Int{
-        return reviews.value!!.count {
+        return currentReviews.value!!.count {
             it.pokemon!!.localized(localeStore.locale!!) == pokemonName.localized(localeStore.locale!!)
         }
     }
 
     fun getAverageScore(pokemonName: LocaleField): Float {
-        val averageScoreMap = reviews.value!!.groupBy {
+        val averageScoreMap = currentReviews.value!!.groupBy {
             it.pokemon!!.localized(localeStore.locale!!)
         }.mapValues { (key, reviews) ->
             reviews.map { it.rating }.average().toFloat()
@@ -84,7 +96,7 @@ class PokemonReviewsViewModel @Inject constructor(
 
     fun getSkillPreference(pokemonName: LocaleField):ArrayList<Int>  {
         val counts = ArrayList(listOf(0, 0, 0, 0))
-        val _review = reviews.value!!.filter {
+        val _review = currentReviews.value!!.filter {
             it.pokemon!!.localized(localeStore.locale!!) == pokemonName.localized(localeStore.locale!!)
         }
         _review.forEach { review ->
@@ -99,7 +111,7 @@ class PokemonReviewsViewModel @Inject constructor(
     }
 
     fun getSortedReview(pokemonName: LocaleField):List<PokemonReviewsData>{
-        return reviews.value!!.filter {
+        return currentReviews.value!!.filter {
             it.pokemon!!.localized(localeStore.locale!!) == pokemonName.localized(localeStore.locale!!)
         }.sortedByDescending { it.likes.size }
     }
@@ -112,6 +124,15 @@ class PokemonReviewsViewModel @Inject constructor(
             return 50
         }
         return Math.max(a/(a+b),b/(a+b))*100
+    }
+
+    fun filterReportedReview(_reviews:List<PokemonReviewsData>, currentUser: FirebaseUser): List<PokemonReviewsData> {
+        Log.d("TEST1", "${_reviews.size}")
+        val a =_reviews.filter {
+            !(it.reported.containsKey(currentUser.uid))
+        }
+        Log.d("TEST1", "${a.size}")
+        return a
     }
 
     fun updateLike(
@@ -140,7 +161,10 @@ class PokemonReviewsViewModel @Inject constructor(
                         databaseError: DatabaseError?,
                         committed: Boolean,
                         currentData: DataSnapshot?
-                    ) { }
+                    ) {
+                        fetchReviewSnapshot()
+                        setCurrentReviews()
+                    }
                 })
             } else {
                 throw Exception("Failed to update Like")
@@ -148,35 +172,47 @@ class PokemonReviewsViewModel @Inject constructor(
         }
     }
 
-    fun setReportTrue(pokemonName: String, uid:String, uidOfWriter:String){
+    fun removeReview(
+        review: PokemonReviewsData
+    ){
         viewModelScope.launch {
-            val reportRef = repository.getQueryForReport(pokemonName,uid,uidOfWriter)
-            if(reportRef is Response.Success){
-                reportRef.data.setValue(true)
-            } else{
-                Log.d("ReviewReportQueryError", "Query Error")
+            val ref = repository.fetchReviewReference(review)
+            if (ref is Response.Success){
+               ref.data.removeValue()
+            } else {
+                throw Exception("Failed to remove Review")
             }
         }
     }
 
-    fun setReviews(){
-        val reviewsList = ArrayList<PokemonReviewsData>()
-        reviewSnapshot.value!!.children.forEach{ pokemonSnap->
-            pokemonSnap.children.forEach { reviewSnap ->
-                val data = reviewSnap.getValue(PokemonReviewsData::class.java)!!
-                reviewsList.add(data)
-            }
-        }
-        _reviews.value = reviewsList
-    }
-
-    fun removeMyReview(pokemonName: String, uid:String){
+    fun reportReview(
+        review: PokemonReviewsData,
+        currentUser: FirebaseUser
+    ){
         viewModelScope.launch {
-            val myReviewRef = repository.getQueryForMyReview(pokemonName,uid)
-            if(myReviewRef is Response.Success){
-                myReviewRef.data.removeValue()
-            } else{
-                Log.d("Error during REALTIME_DB", "My Review Query Error")
+            val ref = repository.fetchReviewReference(review)
+            if (ref is Response.Success){
+                ref.data.runTransaction(object : Transaction.Handler {
+                    override fun doTransaction(mutableData: MutableData): Transaction.Result {
+                        val p = mutableData.getValue(PokemonReviewsData::class.java)
+                            ?: return Transaction.success(mutableData)
+
+                        p.reported[currentUser.uid] = true
+
+                        mutableData.value = p
+                        return Transaction.success(mutableData)
+                    }
+
+                    override fun onComplete(
+                        databaseError: DatabaseError?,
+                        committed: Boolean,
+                        currentData: DataSnapshot?
+                    ) {
+                        fetchReviewSnapshot()
+                    }
+                })
+            } else {
+                throw Exception("Failed to remove Review")
             }
         }
     }
@@ -195,16 +231,16 @@ class PokemonReviewsViewModel @Inject constructor(
 
                                 if(auth.uid != null && data.uid != auth.uid){
                                     val reported:Boolean = (ds.child(Constants.QUERY_REPORTERS).child(auth.uid!!).value?:false) as Boolean
-                                    data.isLiked = (ds.child(Constants.QUERY_LIKES).child(auth.uid!!).value?: false) as Boolean
+                                    //data.isLiked = (ds.child(Constants.QUERY_LIKES).child(auth.uid!!).value?: false) as Boolean
                                     if(!reported){
                                         reviewList.add(data)
                                     }
                                 } else if(auth.uid != null && data.uid == auth.uid){
-                                    data.isLiked = (ds.child(Constants.QUERY_LIKES).child(auth.uid!!).value?: false) as Boolean
+                                    //data.isLiked = (ds.child(Constants.QUERY_LIKES).child(auth.uid!!).value?: false) as Boolean
                                     myReviewList.add(data)
                                     myReviewData.value = myReviewList
                                 } else if(auth.uid == null){
-                                    data.isLiked = false
+                                    //data.isLiked = false
                                     reviewList.add(data)
                                 }
                                 reviewData.value = reviewList.reversed()

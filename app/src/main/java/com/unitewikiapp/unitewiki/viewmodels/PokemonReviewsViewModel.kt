@@ -132,7 +132,7 @@ class PokemonReviewsViewModel @Inject constructor(
                             p.likes[currentUser.uid] = true
                         }
 
-                        mutableData.value = p
+                        mutableData.value = p.toMap()
                         return Transaction.success(mutableData)
                     }
 
@@ -144,6 +144,49 @@ class PokemonReviewsViewModel @Inject constructor(
                 })
             } else {
                 throw Exception("Failed to update Like")
+            }
+        }
+    }
+
+    fun removeReview(
+        review: PokemonReviewsData,
+        currentUser: FirebaseUser
+    ){
+        viewModelScope.launch {
+            val ref = repository.fetchReviewReference(review)
+            if (ref is Response.Success){
+               ref.data.removeValue()
+            } else {
+                throw Exception("Failed to remove Review")
+            }
+        }
+    }
+
+    fun reportReview(
+        review: PokemonReviewsData
+    ){
+        viewModelScope.launch {
+            val ref = repository.fetchReviewReference(review)
+            if (ref is Response.Success){
+                ref.data.runTransaction(object : Transaction.Handler {
+                    override fun doTransaction(mutableData: MutableData): Transaction.Result {
+                        val p = mutableData.getValue(PokemonReviewsData::class.java)
+                            ?: return Transaction.success(mutableData)
+
+                        p.reported += 1
+
+                        mutableData.value = p
+                        return Transaction.success(mutableData)
+                    }
+
+                    override fun onComplete(
+                        databaseError: DatabaseError?,
+                        committed: Boolean,
+                        currentData: DataSnapshot?
+                    ) { }
+                })
+            } else {
+                throw Exception("Failed to remove Review")
             }
         }
     }

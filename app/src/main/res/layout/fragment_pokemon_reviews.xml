@@ -11,7 +11,7 @@
             type="boolean"/>
 
         <variable
-            name="doIwritereivew"
+            name="IsMyReviewExist"
             type="boolean"/>
 
     </data>
@@ -124,7 +124,7 @@
                     android:fontFamily="@font/aritadotum_medium"
                     android:text="@string/myreview"
                     android:textSize="15sp"
-                    app:isVisible="@{doIwritereivew}"
+                    app:isVisible="@{IsMyReviewExist}"
                     app:layout_constraintLeft_toRightOf="@id/ganpan"
                     app:layout_constraintTop_toBottomOf="@id/sorting_button" />
 
@@ -133,7 +133,7 @@
                     android:layout_width="6dp"
                     android:layout_height="15dp"
                     android:src="@drawable/splash_screen"
-                    app:isVisible="@{doIwritereivew}"
+                    app:isVisible="@{IsMyReviewExist}"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/sorting_button" />
 
@@ -142,7 +142,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginTop="12dp"
-                    app:isVisible="@{doIwritereivew}"
+                    app:isVisible="@{IsMyReviewExist}"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/ganpan" />
 
@@ -195,7 +195,7 @@
         app:layout_constraintRight_toRightOf="parent"
         android:layout_gravity="center_horizontal|bottom"
         android:layout_marginBottom="30dp"
-        app:isVisible="@{!IsEmpty || doIwritereivew }">
+        app:isVisible="@{!IsEmpty || IsMyReviewExist }">
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/writing_button_image"
@@ -221,7 +221,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:isVisible="@{ !doIwritereivew &amp;&amp; IsEmpty }"
+        app:isVisible="@{ !IsMyReviewExist &amp;&amp; IsEmpty }"
         app:layout_anchor="@+id/frameLayout"
         app:layout_anchorGravity="center">
 
@@ -229,7 +229,7 @@
             android:id="@+id/writing_button_empty_root"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:isVisible="@{ !doIwritereivew &amp;&amp; IsEmpty }"
+            app:isVisible="@{ !IsMyReviewExist &amp;&amp; IsEmpty }"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"

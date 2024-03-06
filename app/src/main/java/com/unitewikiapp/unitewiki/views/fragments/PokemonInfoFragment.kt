@@ -127,7 +127,7 @@ class PokemonInfoFragment : Fragment(),
                 lSkillPreference = reviewViewModel.calculatePreference(skillSelections[0], skillSelections[1])
                 rSkillPreference = reviewViewModel.calculatePreference(skillSelections[2], skillSelections[3])
 
-                var simpleReviews = reviewViewModel.getSortedReview(name).take(3)
+                var simpleReviews = reviewViewModel.getLikeSortedReview(name).take(3)
                 if(authViewModel.currentUser.value!=null) {
                     simpleReviews = reviewViewModel.filterReportedReview(
                         simpleReviews,

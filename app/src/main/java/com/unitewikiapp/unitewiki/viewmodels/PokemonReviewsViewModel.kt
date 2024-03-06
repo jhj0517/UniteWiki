@@ -37,10 +37,9 @@ class PokemonReviewsViewModel @Inject constructor(
             when (snapShot){
                 is Response.Success -> {
                     reviewSnapshot.value = snapShot.data
-                    setCurrentReviews()
                 }
                 else -> {
-                    throw Exception("Failed to fetch data")
+                    throw Exception("Failed to fetch review data")
                 }
             }
         }
@@ -56,7 +55,6 @@ class PokemonReviewsViewModel @Inject constructor(
         }
         _currentReviews.value = reviewsList
     }
-
 
     fun sortPokemonByScore(unSorted: ArrayList<PokemonRankData>): ArrayList<PokemonRankData>{
         val averageScoreMap = currentReviews.value!!.groupBy { it.pokemon!!.localized(localeStore.locale!!) }
@@ -104,10 +102,16 @@ class PokemonReviewsViewModel @Inject constructor(
         return counts
     }
 
-    fun getSortedReview(pokemonName: LocaleField):List<PokemonReviewsData>{
+    fun getLikeSortedReview(pokemonName: LocaleField):List<PokemonReviewsData>{
         return currentReviews.value!!.filter {
             it.pokemon!!.localized(localeStore.locale!!) == pokemonName.localized(localeStore.locale!!)
         }.sortedByDescending { it.likes.size }
+    }
+
+    fun getTimeSortedReview(pokemonName: LocaleField):List<PokemonReviewsData>{
+        return currentReviews.value!!.filter {
+            it.pokemon!!.localized(localeStore.locale!!) == pokemonName.localized(localeStore.locale!!)
+        }.sortedByDescending { it.time }
     }
 
     fun calculatePreference(a: Int, b: Int):Int{
@@ -203,7 +207,7 @@ class PokemonReviewsViewModel @Inject constructor(
                     }
                 })
             } else {
-                throw Exception("Failed to remove Review")
+                throw Exception("Failed to report Review")
             }
         }
     }

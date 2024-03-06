@@ -1,15 +1,15 @@
 package com.unitewikiapp.unitewiki.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.database.*
-import com.google.firebase.database.ktx.getValue
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.MutableData
+import com.google.firebase.database.Transaction
 import com.unitewikiapp.unitewiki.datas.*
-import com.unitewikiapp.unitewiki.utils.Constants
 import com.unitewikiapp.unitewiki.utils.LocaleStore
 import com.unitewikiapp.unitewiki.utils.Response
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,11 +22,6 @@ class PokemonReviewsViewModel @Inject constructor(
     private val auth: FirebaseAuth,
     private val localeStore: LocaleStore
     ) : ViewModel(){
-
-    val pokemonName = MutableLiveData<String>()
-    val reviewData = MutableLiveData<List<PokemonReviewsData>>()
-    val myReviewData = MutableLiveData<ArrayList<PokemonReviewsData>>()
-    lateinit var valueEventListener: ValueEventListener
 
     private val _reviewSnapshot = MutableLiveData<DataSnapshot?>()
     val reviewSnapshot get() = _reviewSnapshot
@@ -44,6 +39,7 @@ class PokemonReviewsViewModel @Inject constructor(
             when (snapShot){
                 is Response.Success -> {
                     reviewSnapshot.value = snapShot.data
+                    setCurrentReviews()
                 }
                 else -> {
                     throw Exception("Failed to fetch data")
@@ -127,12 +123,9 @@ class PokemonReviewsViewModel @Inject constructor(
     }
 
     fun filterReportedReview(_reviews:List<PokemonReviewsData>, currentUser: FirebaseUser): List<PokemonReviewsData> {
-        Log.d("TEST1", "${_reviews.size}")
-        val a =_reviews.filter {
+        return _reviews.filter {
             !(it.reported.containsKey(currentUser.uid))
         }
-        Log.d("TEST1", "${a.size}")
-        return a
     }
 
     fun updateLike(
@@ -163,7 +156,6 @@ class PokemonReviewsViewModel @Inject constructor(
                         currentData: DataSnapshot?
                     ) {
                         fetchReviewSnapshot()
-                        setCurrentReviews()
                     }
                 })
             } else {
@@ -178,7 +170,8 @@ class PokemonReviewsViewModel @Inject constructor(
         viewModelScope.launch {
             val ref = repository.fetchReviewReference(review)
             if (ref is Response.Success){
-               ref.data.removeValue()
+                ref.data.removeValue()
+                fetchReviewSnapshot()
             } else {
                 throw Exception("Failed to remove Review")
             }
@@ -216,60 +209,5 @@ class PokemonReviewsViewModel @Inject constructor(
             }
         }
     }
-
-    fun addReviewValueListener(pokemonName: String, query:String){
-        viewModelScope.launch {
-            val pokemonReviewRef = repository.getQuery(pokemonName,query)
-            when(pokemonReviewRef){
-                is Response.Success -> {
-                    valueEventListener = object : ValueEventListener {
-                        override fun onDataChange(snapshot: DataSnapshot) {
-                            val reviewList = ArrayList<PokemonReviewsData>()
-                            val myReviewList = ArrayList<PokemonReviewsData>()
-                            for (ds in snapshot.children) {
-                                val data = ds.getValue<PokemonReviewsData>()?: PokemonReviewsData()
-
-                                if(auth.uid != null && data.uid != auth.uid){
-                                    val reported:Boolean = (ds.child(Constants.QUERY_REPORTERS).child(auth.uid!!).value?:false) as Boolean
-                                    //data.isLiked = (ds.child(Constants.QUERY_LIKES).child(auth.uid!!).value?: false) as Boolean
-                                    if(!reported){
-                                        reviewList.add(data)
-                                    }
-                                } else if(auth.uid != null && data.uid == auth.uid){
-                                    //data.isLiked = (ds.child(Constants.QUERY_LIKES).child(auth.uid!!).value?: false) as Boolean
-                                    myReviewList.add(data)
-                                    myReviewData.value = myReviewList
-                                } else if(auth.uid == null){
-                                    //data.isLiked = false
-                                    reviewList.add(data)
-                                }
-                                reviewData.value = reviewList.reversed()
-                            }
-                        }
-                        override fun onCancelled(error: DatabaseError) {}
-                    }
-                    pokemonReviewRef.data.addValueEventListener(valueEventListener)
-                }
-                is Response.Failure ->{
-                    Log.d("Error during REALTIME_DB", "Query Error")
-                }
-            }
-        }
-    }
-
-    fun removeReviewValueListener(pokemonName: String, query:String){
-        viewModelScope.launch {
-            val ref = repository.getQuery(pokemonName, query)
-            when(ref){
-                is Response.Success -> {
-                    ref.data.removeEventListener(valueEventListener)
-                }
-                is Response.Failure ->{
-                    Log.d("Error during REALTIME_DB", "Query Error")
-                }
-            }
-        }
-    }
-
 
 }

@@ -81,7 +81,10 @@ class PokemonInfoFragment : Fragment(),
                 navigateWithDirection(direction)
             }
             reviewNavigationButton.setOnClickListener {
-                reviewViewModel.fetchReviewSnapshot()
+                val direction = PokemonInfoFragmentDirections.actionPokemonInfoFragmentToPokemonReviewsFragment(
+                    this@PokemonInfoFragment.pokemonName
+                )
+                navigateWithDirection(direction)
             }
             NoReviewIndicator.setOnClickListener {
                 val direction = PokemonInfoFragmentDirections.actionPokemonInfoFragmentToPokemonReviewsFragment(

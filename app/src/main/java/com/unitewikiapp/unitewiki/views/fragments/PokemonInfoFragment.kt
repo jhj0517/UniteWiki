@@ -54,9 +54,6 @@ class PokemonInfoFragment : Fragment(),
         infoViewModel.setCurrentPokemon(pokemonName)
     }
 
-    //4. 리사이클러뷰 어댑터 손보기
-    //5. 로그인 손대기
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,

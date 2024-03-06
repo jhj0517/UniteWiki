@@ -19,7 +19,6 @@ import javax.inject.Inject
 @HiltViewModel
 class PokemonReviewsViewModel @Inject constructor(
     private val repository:ReviewRepository,
-    private val auth: FirebaseAuth,
     private val localeStore: LocaleStore
     ) : ViewModel(){
 

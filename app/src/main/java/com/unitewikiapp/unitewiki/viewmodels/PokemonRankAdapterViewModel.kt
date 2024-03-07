@@ -12,6 +12,10 @@ class PokemonRankAdapterViewModel (rankItems: PokemonRankData) {
     val averageRatingRatingBar:Float
         get() = items.average_rating
     val averageRating:String?
-        get() = items.average_rating.toString()
+        get() = roundScore(items.average_rating).toString()
+
+    private fun roundScore(averageScore: Float): Float {
+        return Math.round(averageScore*10)/10.0f
+    }
 
 }

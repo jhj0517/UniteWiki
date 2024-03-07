@@ -99,7 +99,7 @@
                         android:id="@+id/userDisplayName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@{viewModel.user.displayName}"
+                        android:text="@{viewModel.currentUser.displayName}"
                         android:textSize="35sp"
                         android:textColor="@color/black"
                         android:fontFamily="@font/aritadotum"/>
@@ -113,7 +113,7 @@
                     app:layout_constraintTop_toBottomOf="@id/namelayout"
                     app:layout_constraintLeft_toLeftOf="parent"
                     android:layout_marginTop="1dp"
-                    android:text="@{viewModel.user.email}"/>
+                    android:text="@{viewModel.currentUser.email}"/>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.appcompat.widget.LinearLayoutCompat

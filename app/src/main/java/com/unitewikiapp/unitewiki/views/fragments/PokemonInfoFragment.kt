@@ -23,7 +23,7 @@ import com.unitewikiapp.unitewiki.datas.localized
 import com.unitewikiapp.unitewiki.utils.LocaleStore
 import com.unitewikiapp.unitewiki.utils.ReviewPopup
 import com.unitewikiapp.unitewiki.utils.TooltipWindow
-import com.unitewikiapp.unitewiki.viewmodels.LoginViewModel
+import com.unitewikiapp.unitewiki.viewmodels.AuthViewModel
 import com.unitewikiapp.unitewiki.viewmodels.PokemonInfoViewModel
 import com.unitewikiapp.unitewiki.viewmodels.PokemonReviewsViewModel
 import com.unitewikiapp.unitewiki.views.fragments.PokemonInfoFragment.ToolCallback
@@ -39,7 +39,7 @@ class PokemonInfoFragment : Fragment(),
     private lateinit var pokemonName:String
     private val infoViewModel:PokemonInfoViewModel by activityViewModels()
     private val reviewViewModel:PokemonReviewsViewModel by activityViewModels()
-    private val authViewModel:LoginViewModel by activityViewModels()
+    private val authViewModel:AuthViewModel by activityViewModels()
     private lateinit var backCallBack: OnBackPressedCallback
     private lateinit var tooltip:TooltipWindow
     @Inject

@@ -15,7 +15,7 @@
             type="boolean"/>
         <variable
             name="viewModel"
-            type="com.unitewikiapp.unitewiki.viewmodels.LoginViewModel" />
+            type="com.unitewikiapp.unitewiki.viewmodels.AuthViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout

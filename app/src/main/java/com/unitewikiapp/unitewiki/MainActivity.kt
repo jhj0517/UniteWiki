@@ -9,7 +9,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.unitewikiapp.unitewiki.utils.ContextWrapper
 import com.unitewikiapp.unitewiki.utils.PreferenceManager
-import com.unitewikiapp.unitewiki.viewmodels.LoginViewModel
+import com.unitewikiapp.unitewiki.viewmodels.AuthViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -19,7 +19,7 @@ import java.util.*
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity () {
 
-    private val loginViewModel: LoginViewModel by viewModels()
+    private val authViewModel: AuthViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,19 +30,19 @@ class MainActivity : AppCompatActivity () {
             }
             loadingJob.join()
 
-            val afterloading = launch {
+            val afterLoading = launch {
                 setContentView(R.layout.activity_main)
             }
-            afterloading.join()
+            afterLoading.join()
         }
     }
 
     override fun onCreateView(name: String, context: Context, attrs: AttributeSet): View? {
-        loginViewModel.addAuthListener()
+        authViewModel.addAuthListener()
         return super.onCreateView(name, context, attrs)
     }
 
-    private val prefManager:PreferenceManager = PreferenceManager()
+    private val prefManager: PreferenceManager = PreferenceManager()
 
     override fun attachBaseContext(newBase: Context?) {
         var localelang = prefManager.getString(newBase!!,"locale")?.lowercase()
@@ -56,6 +56,6 @@ class MainActivity : AppCompatActivity () {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        loginViewModel.getResultOnActivity(requestCode,resultCode,data,this)
+        authViewModel.getResultOnActivity(requestCode,resultCode,data,this)
     }
 }

@@ -16,7 +16,7 @@ import androidx.navigation.fragment.findNavController
 import com.unitewikiapp.unitewiki.R
 import com.unitewikiapp.unitewiki.databinding.FragmentReviewWritingBinding
 import com.unitewikiapp.unitewiki.datas.PokemonReviewsData
-import com.unitewikiapp.unitewiki.viewmodels.LoginViewModel
+import com.unitewikiapp.unitewiki.viewmodels.AuthViewModel
 import com.unitewikiapp.unitewiki.viewmodels.PokemonInfoViewModel
 import com.unitewikiapp.unitewiki.viewmodels.PokemonReviewsViewModel
 import com.unitewikiapp.unitewiki.views.dialogfragments.WritingDialogFragment
@@ -34,7 +34,7 @@ class ReviewWritingFragment : Fragment()
     private val dialog = WritingDialogFragment()
     private val infoViewModel :PokemonInfoViewModel by activityViewModels()
     private val reviewViewModel: PokemonReviewsViewModel by activityViewModels()
-    private val authViewModel: LoginViewModel by activityViewModels()
+    private val authViewModel: AuthViewModel by activityViewModels()
 
     private var _binding:FragmentReviewWritingBinding?=null
     private val binding get() = _binding!!

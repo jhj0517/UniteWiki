@@ -16,7 +16,7 @@ import com.unitewikiapp.unitewiki.databinding.FragmentPokemonReviewsBinding
 import com.unitewikiapp.unitewiki.datas.PokemonReviewsData
 import com.unitewikiapp.unitewiki.utils.LocaleStore
 import com.unitewikiapp.unitewiki.utils.ReviewPopup
-import com.unitewikiapp.unitewiki.viewmodels.LoginViewModel
+import com.unitewikiapp.unitewiki.viewmodels.AuthViewModel
 import com.unitewikiapp.unitewiki.viewmodels.PokemonInfoViewModel
 import com.unitewikiapp.unitewiki.viewmodels.PokemonReviewsViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,7 +32,7 @@ class PokemonReviewsFragment : Fragment(), PokemonReviewsAdapter.ClickCallback, 
     private lateinit var pokemonName:String
     private val reviewViewModel:PokemonReviewsViewModel by activityViewModels()
     private val infoViewModel:PokemonInfoViewModel by activityViewModels()
-    private val authViewModel:LoginViewModel by activityViewModels()
+    private val authViewModel:AuthViewModel by activityViewModels()
     private var _binding:FragmentPokemonReviewsBinding? = null
     private val binding get() = _binding!!
 

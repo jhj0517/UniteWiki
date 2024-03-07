@@ -60,6 +60,14 @@ class PokemonReviewsViewModel @Inject constructor(
         _reviews.value = reviewsList
     }
 
+    fun setDraft(draft:PokemonReviewsData){
+        _draft.value = draft
+    }
+
+    fun cleanDraft(){
+        _draft.value = PokemonReviewsData()
+    }
+
     fun sortPokemonByScore(unSorted: ArrayList<PokemonRankData>): ArrayList<PokemonRankData>{
         val averageScoreMap = reviews.value!!.groupBy { it.pokemon!!.localized(localeStore.locale!!) }
             .mapValues { (key, reviews) ->
@@ -166,6 +174,20 @@ class PokemonReviewsViewModel @Inject constructor(
                 })
             } else {
                 throw Exception("Failed to update Like")
+            }
+        }
+    }
+
+    fun addReview(
+        review: PokemonReviewsData
+    ){
+        viewModelScope.launch {
+            val ref = repository.fetchReviewReference(review)
+            if (ref is Response.Success){
+                ref.data.setValue(review)
+                fetchReviewSnapshot()
+            } else {
+                throw Exception("Failed to add Review")
             }
         }
     }

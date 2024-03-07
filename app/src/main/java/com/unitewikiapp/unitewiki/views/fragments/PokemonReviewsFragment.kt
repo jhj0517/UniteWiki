@@ -168,7 +168,7 @@ class PokemonReviewsFragment : Fragment(), PokemonReviewsAdapter.ClickCallback, 
     override fun onPopupMenuItemClick(itemId: Int, position:Int, itemData: PokemonReviewsData?, anchor: View){
         when (itemId) {
             R.id.edit -> {
-                val direction = PokemonReviewsFragmentDirections.actionPokemonReviewsFragmentToReviewWritingFragment(pokemonName)
+                val direction = PokemonReviewsFragmentDirections.actionPokemonReviewsFragmentToReviewWritingFragment(pokemonName, true)
                 reviewViewModel.draft.value = itemData
                 findNavController().navigate(direction)
             }
@@ -184,7 +184,7 @@ class PokemonReviewsFragment : Fragment(), PokemonReviewsAdapter.ClickCallback, 
     private fun navigateAfterLoginCheck(){
         val user = authViewModel.currentUser.value
         if(user?.uid!=null){
-            val direction = PokemonReviewsFragmentDirections.actionPokemonReviewsFragmentToReviewWritingFragment(pokemonName)
+            val direction = PokemonReviewsFragmentDirections.actionPokemonReviewsFragmentToReviewWritingFragment(pokemonName, false)
             findNavController().navigate(direction)
         } else {
             authViewModel.signIn(requireActivity())

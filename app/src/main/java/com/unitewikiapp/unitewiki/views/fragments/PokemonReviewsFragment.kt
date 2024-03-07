@@ -110,7 +110,7 @@ class PokemonReviewsFragment : Fragment(), PokemonReviewsAdapter.ClickCallback, 
             isEmpty = reviewViewModel.reviews.value.isNullOrEmpty()
 
             reviewViewModel.reviewSnapshot.observe(viewLifecycleOwner){
-                reviewViewModel.setCurrentReviews()
+                reviewViewModel.setReviews()
                 val reviews = reviewViewModel.getLikeSortedReview(infoViewModel.currentPokemon.value!!.pokemon_name)
                 val (myReview, others) = reviews.partition {
                     it.uid == authViewModel.currentUser.value?.uid
@@ -168,7 +168,8 @@ class PokemonReviewsFragment : Fragment(), PokemonReviewsAdapter.ClickCallback, 
     override fun onPopupMenuItemClick(itemId: Int, position:Int, itemData: PokemonReviewsData?, anchor: View){
         when (itemId) {
             R.id.edit -> {
-                val direction = PokemonReviewsFragmentDirections.actionPokemonReviewsFragmentToReviewWritingFragment(pokemonName,true)
+                val direction = PokemonReviewsFragmentDirections.actionPokemonReviewsFragmentToReviewWritingFragment(pokemonName)
+                reviewViewModel.draft.value = itemData
                 findNavController().navigate(direction)
             }
             R.id.delete -> {
@@ -183,7 +184,7 @@ class PokemonReviewsFragment : Fragment(), PokemonReviewsAdapter.ClickCallback, 
     private fun navigateAfterLoginCheck(){
         val user = authViewModel.currentUser.value
         if(user?.uid!=null){
-            val direction = PokemonReviewsFragmentDirections.actionPokemonReviewsFragmentToReviewWritingFragment(pokemonName,)
+            val direction = PokemonReviewsFragmentDirections.actionPokemonReviewsFragmentToReviewWritingFragment(pokemonName)
             findNavController().navigate(direction)
         } else {
             authViewModel.signIn(requireActivity())

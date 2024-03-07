@@ -116,7 +116,7 @@ class PokemonInfoFragment : Fragment(),
         }
 
         reviewViewModel.reviewSnapshot.observe(viewLifecycleOwner){ review ->
-            reviewViewModel.setCurrentReviews()
+            reviewViewModel.setReviews()
             binding.apply {
                 val name = infoViewModel.currentPokemon.value!!.pokemon_name
                 reviewCount = reviewViewModel.getReviewCount(name)

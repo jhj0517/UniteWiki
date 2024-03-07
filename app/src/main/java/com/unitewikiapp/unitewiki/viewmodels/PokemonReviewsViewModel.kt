@@ -27,6 +27,10 @@ class PokemonReviewsViewModel @Inject constructor(
     private val _reviews = MutableLiveData<List<PokemonReviewsData>>()
     val reviews get() = _reviews
 
+
+    private val _draft = MutableLiveData<PokemonReviewsData>()
+    val draft get() = _draft
+
     init {
         fetchReviewSnapshot()
     }
@@ -45,7 +49,7 @@ class PokemonReviewsViewModel @Inject constructor(
         }
     }
 
-    fun setCurrentReviews(){
+    fun setReviews(){
         val reviewsList = ArrayList<PokemonReviewsData>()
         reviewSnapshot.value!!.children.forEach{ pokemonSnap->
             pokemonSnap.children.forEach { reviewSnap ->

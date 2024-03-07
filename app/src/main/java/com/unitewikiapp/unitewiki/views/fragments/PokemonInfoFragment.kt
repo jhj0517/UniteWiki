@@ -221,7 +221,8 @@ class PokemonInfoFragment : Fragment(),
     override fun onPopupMenuItemClick(itemId: Int, position:Int, itemData: PokemonReviewsData?, anchor: View){
         when (itemId) {
             R.id.edit -> {
-                val direction = PokemonReviewsFragmentDirections.actionPokemonReviewsFragmentToReviewWritingFragment(pokemonName,true)
+                reviewViewModel.setDraft(itemData!!)
+                val direction = PokemonInfoFragmentDirections.actionPokemonInfoFragmentToReviewWritingFragment(pokemonName,false)
                 findNavController().navigate(direction)
             }
             R.id.delete -> {

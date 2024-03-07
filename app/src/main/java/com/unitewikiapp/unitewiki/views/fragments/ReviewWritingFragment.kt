@@ -11,14 +11,14 @@ import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.unitewikiapp.unitewiki.R
 import com.unitewikiapp.unitewiki.databinding.FragmentReviewWritingBinding
-import com.unitewikiapp.unitewiki.datas.PokemonReviewWritingData
+import com.unitewikiapp.unitewiki.datas.PokemonReviewsData
 import com.unitewikiapp.unitewiki.viewmodels.LoginViewModel
-import com.unitewikiapp.unitewiki.viewmodels.PokemonReviewWrtingViewModel
-import com.unitewikiapp.unitewiki.views.dialogfragments.SelectsSkillsDialogFragment
+import com.unitewikiapp.unitewiki.viewmodels.PokemonInfoViewModel
+import com.unitewikiapp.unitewiki.viewmodels.PokemonReviewsViewModel
 import com.unitewikiapp.unitewiki.views.dialogfragments.WritingDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -26,16 +26,15 @@ const val MAX_REVIEW_LENGTH = 1000
 
 @AndroidEntryPoint
 class ReviewWritingFragment : Fragment()
-    , WritingDialogFragment.OnDialogButtonClick
-    , SelectsSkillsDialogFragment.OnDialogButtonClick{
+    , WritingDialogFragment.OnDialogButtonClick{
 
     private lateinit var pokemonname:String
     private var isEditing:Boolean? = null
     private lateinit var callback: OnBackPressedCallback
     private val dialog = WritingDialogFragment()
-    private val selectDialog = SelectsSkillsDialogFragment()
-    private val viewmodel :PokemonReviewWrtingViewModel by viewModels()
-    private val loginViewModel: LoginViewModel by viewModels()
+    private val infoViewModel :PokemonInfoViewModel by activityViewModels()
+    private val reviewViewModel: PokemonReviewsViewModel by activityViewModels()
+    private val authViewModel: LoginViewModel by activityViewModels()
 
     private var _binding:FragmentReviewWritingBinding?=null
     private val binding get() = _binding!!
@@ -52,36 +51,28 @@ class ReviewWritingFragment : Fragment()
     ): View? {
         _binding = FragmentReviewWritingBinding.inflate(inflater,container,false)
         binding.apply {
-            viewModel = viewmodel
+            infoVm = infoViewModel
+            reviewVm = reviewViewModel
             lifecycleOwner = viewLifecycleOwner
-            addETListeners(reviewWriting,reviewlenIndicator,buttonCommit)
-            addSkillSelectListeners(this)
-            buttonCommit.setOnClickListener {
-                if(viewmodel.firstClickState.value==null || viewmodel.secondClickState.value==null){
-                    selectDialog.show(requireActivity().supportFragmentManager,"dialog")
-                }else{
-                    val user = loginViewModel.currentUser
-                    val data = PokemonReviewWritingData(
-                        pokemon=pokemonname,
-                        writing = reviewWriting.text.toString(),
-                        rating = ratingBar.rating.toInt(),
-                        firstSkillSetRate = if(viewmodel.firstClickState.value == true) 0 else 1,
-                        secondSkillSetRate = if(viewmodel.secondClickState.value == true) 0 else 1,
-                        userName = user.value!!.displayName!!,
-                        uid= user.value!!.uid
-                    )
-                    viewmodel.commitPosting(pokemonname,user.value!!.uid,data)
+            addETListeners(reviewWriting, reviewlenIndicator, buttonCommit)
 
-                    val direction = ReviewWritingFragmentDirections.actionReviewWritingFragmentToPokemonReviewsFragment(pokemonname)
-                    findNavController().navigate(direction)
-                }
+            skill1.setOnClickListener { skill1Selected = true }
+            skill2.setOnClickListener { skill1Selected = false }
+            skill3.setOnClickListener { skill3Selected = true }
+            skill4.setOnClickListener { skill3Selected = false }
+
+            buttonCommit.setOnClickListener {
+                saveDraft()
+                findNavController().popBackStack()
+                reviewViewModel.addReview(reviewViewModel.draft.value!!)
+                reviewViewModel.cleanDraft()
             }
             navigateBackbtn.setOnClickListener {
                 dialog.show(requireActivity().supportFragmentManager,"dialog")
+                reviewViewModel.cleanDraft()
             }
         }
 
-        subscribeUI(pokemonname)
         return binding.root
     }
 
@@ -90,29 +81,6 @@ class ReviewWritingFragment : Fragment()
         super.onDestroyView()
     }
 
-    private fun subscribeUI(pokemonName: String) {
-        viewmodel.fetchInfo(pokemonName)
-        when (isEditing) {
-            true -> {
-                val user = loginViewModel.currentUser.value
-                viewmodel.fetchMyReviewText(pokemonName,user!!.uid)
-                viewmodel.myReview.observe(viewLifecycleOwner){
-                    binding.reviewWriting.setText(it)
-                }
-            }
-            else -> {}
-        }
-    }
-
-    private fun addSkillSelectListeners(binding:FragmentReviewWritingBinding){
-        // This will implement changes to the UI through the BindingAdapter class and the fragment_review_writing.xml.
-        binding.apply {
-            skill1.setOnClickListener { viewmodel.firstClickState.value = true }
-            skill2.setOnClickListener { viewmodel.firstClickState.value= false }
-            skill3.setOnClickListener { viewmodel.secondClickState.value = true }
-            skill4.setOnClickListener { viewmodel.secondClickState.value = false }
-        }
-    }
 
     private fun addETListeners(et:EditText,tv: TextView,tvCommit:TextView){
         // different border color by focus and character limit for content.
@@ -149,9 +117,29 @@ class ReviewWritingFragment : Fragment()
         }
     }
 
+    private fun saveDraft(){
+        binding.apply {
+            val L_Skill = if (skill1Selected) 1 else 2
+            val R_Skill = if (skill3Selected) 1 else 2
+            reviewViewModel.setDraft(
+                PokemonReviewsData(
+                    writing = reviewWriting.text.toString(),
+                    time = System.currentTimeMillis(),
+                    selectedSkills = "${L_Skill},${R_Skill}",
+                    rating = ratingBar.rating.toInt(),
+                    pokemon = infoViewModel.currentPokemon.value!!.pokemon_name,
+                    edited = isEditing!!,
+                    uid = authViewModel.currentUser.value!!.uid,
+                    userName = authViewModel.currentUser.value!!.displayName,
+                    reported = reviewViewModel.draft.value?.reported?: hashMapOf(),
+                    likes = reviewViewModel.draft.value?.likes ?: hashMapOf()
+                )
+            )
+        }
+    }
+
     override fun onOKClick() {
-        val direction = ReviewWritingFragmentDirections.actionReviewWritingFragmentToPokemonReviewsFragment(pokemonname)
-        findNavController().navigate(direction)
+        findNavController().popBackStack()
         dialog.dismiss()
     }
 
@@ -159,14 +147,9 @@ class ReviewWritingFragment : Fragment()
         dialog.dismiss()
     }
 
-    override fun onOKlClick() {
-        selectDialog.dismiss()
-    }
-
     override fun onAttach(context: Context) {
         super.onAttach(context)
         dialog.setListener(this)
-        selectDialog.setListener(this)
         callback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 dialog.show(requireActivity().supportFragmentManager,"dialog")

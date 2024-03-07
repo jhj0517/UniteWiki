@@ -24,8 +24,8 @@ class PokemonReviewsViewModel @Inject constructor(
     private val _reviewSnapshot = MutableLiveData<DataSnapshot?>()
     val reviewSnapshot get() = _reviewSnapshot
 
-    private val _currentReviews = MutableLiveData<List<PokemonReviewsData>>()
-    val currentReviews get() = _currentReviews
+    private val _reviews = MutableLiveData<List<PokemonReviewsData>>()
+    val reviews get() = _reviews
 
     init {
         fetchReviewSnapshot()
@@ -53,11 +53,11 @@ class PokemonReviewsViewModel @Inject constructor(
                 reviewsList.add(data)
             }
         }
-        _currentReviews.value = reviewsList
+        _reviews.value = reviewsList
     }
 
     fun sortPokemonByScore(unSorted: ArrayList<PokemonRankData>): ArrayList<PokemonRankData>{
-        val averageScoreMap = currentReviews.value!!.groupBy { it.pokemon!!.localized(localeStore.locale!!) }
+        val averageScoreMap = reviews.value!!.groupBy { it.pokemon!!.localized(localeStore.locale!!) }
             .mapValues { (key, reviews) ->
                 reviews.map { it.rating }.average().toFloat()
             }
@@ -71,13 +71,13 @@ class PokemonReviewsViewModel @Inject constructor(
     }
 
     fun getReviewCount(pokemonName: LocaleField): Int{
-        return currentReviews.value!!.count {
+        return reviews.value!!.count {
             it.pokemon!!.localized(localeStore.locale!!) == pokemonName.localized(localeStore.locale!!)
         }
     }
 
     fun getAverageScore(pokemonName: LocaleField): Float {
-        val averageScoreMap = currentReviews.value!!.groupBy {
+        val averageScoreMap = reviews.value!!.groupBy {
             it.pokemon!!.localized(localeStore.locale!!)
         }.mapValues { (key, reviews) ->
             reviews.map { it.rating }.average().toFloat()
@@ -88,7 +88,7 @@ class PokemonReviewsViewModel @Inject constructor(
 
     fun getSkillPreference(pokemonName: LocaleField):ArrayList<Int>  {
         val counts = ArrayList(listOf(0, 0, 0, 0))
-        val _review = currentReviews.value!!.filter {
+        val _review = reviews.value!!.filter {
             it.pokemon!!.localized(localeStore.locale!!) == pokemonName.localized(localeStore.locale!!)
         }
         _review.forEach { review ->
@@ -103,13 +103,13 @@ class PokemonReviewsViewModel @Inject constructor(
     }
 
     fun getLikeSortedReview(pokemonName: LocaleField):List<PokemonReviewsData>{
-        return currentReviews.value!!.filter {
+        return reviews.value!!.filter {
             it.pokemon!!.localized(localeStore.locale!!) == pokemonName.localized(localeStore.locale!!)
         }.sortedByDescending { it.likes.size }
     }
 
     fun getTimeSortedReview(pokemonName: LocaleField):List<PokemonReviewsData>{
-        return currentReviews.value!!.filter {
+        return reviews.value!!.filter {
             it.pokemon!!.localized(localeStore.locale!!) == pokemonName.localized(localeStore.locale!!)
         }.sortedByDescending { it.time }
     }

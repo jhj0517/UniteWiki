@@ -1,7 +1,6 @@
 package com.unitewikiapp.unitewiki.views.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -108,7 +107,7 @@ class PokemonReviewsFragment : Fragment(), PokemonReviewsAdapter.ClickCallback, 
 
     private fun subscribeUI(adapter:PokemonReviewsAdapter,myReviewAdapter: PokemonReviewsAdapter) {
         binding.apply {
-            isEmpty = reviewViewModel.currentReviews.value.isNullOrEmpty()
+            isEmpty = reviewViewModel.reviews.value.isNullOrEmpty()
 
             reviewViewModel.reviewSnapshot.observe(viewLifecycleOwner){
                 reviewViewModel.setCurrentReviews()
@@ -184,7 +183,7 @@ class PokemonReviewsFragment : Fragment(), PokemonReviewsAdapter.ClickCallback, 
     private fun navigateAfterLoginCheck(){
         val user = authViewModel.currentUser.value
         if(user?.uid!=null){
-            val direction = PokemonReviewsFragmentDirections.actionPokemonReviewsFragmentToReviewWritingFragment(pokemonName,false)
+            val direction = PokemonReviewsFragmentDirections.actionPokemonReviewsFragmentToReviewWritingFragment(pokemonName,)
             findNavController().navigate(direction)
         } else {
             authViewModel.signIn(requireActivity())

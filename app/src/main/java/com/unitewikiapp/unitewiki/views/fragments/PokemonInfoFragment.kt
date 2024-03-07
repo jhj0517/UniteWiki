@@ -23,7 +23,7 @@ import com.unitewikiapp.unitewiki.datas.localized
 import com.unitewikiapp.unitewiki.utils.LocaleStore
 import com.unitewikiapp.unitewiki.utils.ReviewPopup
 import com.unitewikiapp.unitewiki.utils.TooltipWindow
-import com.unitewikiapp.unitewiki.viewmodels.LoginViewModel
+import com.unitewikiapp.unitewiki.viewmodels.AuthViewModel
 import com.unitewikiapp.unitewiki.viewmodels.PokemonInfoViewModel
 import com.unitewikiapp.unitewiki.viewmodels.PokemonReviewsViewModel
 import com.unitewikiapp.unitewiki.views.fragments.PokemonInfoFragment.ToolCallback
@@ -39,7 +39,7 @@ class PokemonInfoFragment : Fragment(),
     private lateinit var pokemonName:String
     private val infoViewModel:PokemonInfoViewModel by activityViewModels()
     private val reviewViewModel:PokemonReviewsViewModel by activityViewModels()
-    private val authViewModel:LoginViewModel by activityViewModels()
+    private val authViewModel:AuthViewModel by activityViewModels()
     private lateinit var backCallBack: OnBackPressedCallback
     private lateinit var tooltip:TooltipWindow
     @Inject
@@ -53,9 +53,6 @@ class PokemonInfoFragment : Fragment(),
         pokemonName = arguments?.getString("pokemonname") ?: ""
         infoViewModel.setCurrentPokemon(pokemonName)
     }
-
-    //4. 리사이클러뷰 어댑터 손보기
-    //5. 로그인 손대기
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -84,7 +81,10 @@ class PokemonInfoFragment : Fragment(),
                 navigateWithDirection(direction)
             }
             reviewNavigationButton.setOnClickListener {
-                reviewViewModel.fetchReviewSnapshot()
+                val direction = PokemonInfoFragmentDirections.actionPokemonInfoFragmentToPokemonReviewsFragment(
+                    this@PokemonInfoFragment.pokemonName
+                )
+                navigateWithDirection(direction)
             }
             NoReviewIndicator.setOnClickListener {
                 val direction = PokemonInfoFragmentDirections.actionPokemonInfoFragmentToPokemonReviewsFragment(
@@ -116,7 +116,7 @@ class PokemonInfoFragment : Fragment(),
         }
 
         reviewViewModel.reviewSnapshot.observe(viewLifecycleOwner){ review ->
-            reviewViewModel.setCurrentReviews()
+            reviewViewModel.setReviews()
             binding.apply {
                 val name = infoViewModel.currentPokemon.value!!.pokemon_name
                 reviewCount = reviewViewModel.getReviewCount(name)
@@ -127,7 +127,7 @@ class PokemonInfoFragment : Fragment(),
                 lSkillPreference = reviewViewModel.calculatePreference(skillSelections[0], skillSelections[1])
                 rSkillPreference = reviewViewModel.calculatePreference(skillSelections[2], skillSelections[3])
 
-                var simpleReviews = reviewViewModel.getSortedReview(name).take(3)
+                var simpleReviews = reviewViewModel.getLikeSortedReview(name).take(3)
                 if(authViewModel.currentUser.value!=null) {
                     simpleReviews = reviewViewModel.filterReportedReview(
                         simpleReviews,
@@ -221,7 +221,8 @@ class PokemonInfoFragment : Fragment(),
     override fun onPopupMenuItemClick(itemId: Int, position:Int, itemData: PokemonReviewsData?, anchor: View){
         when (itemId) {
             R.id.edit -> {
-                val direction = PokemonReviewsFragmentDirections.actionPokemonReviewsFragmentToReviewWritingFragment(pokemonName,true)
+                reviewViewModel.setDraft(itemData!!)
+                val direction = PokemonInfoFragmentDirections.actionPokemonInfoFragmentToReviewWritingFragment(pokemonName,false)
                 findNavController().navigate(direction)
             }
             R.id.delete -> {

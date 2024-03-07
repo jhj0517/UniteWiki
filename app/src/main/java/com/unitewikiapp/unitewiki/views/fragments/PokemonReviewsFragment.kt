@@ -6,43 +6,41 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.PopupMenu
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.unitewikiapp.unitewiki.R
 import com.unitewikiapp.unitewiki.adapters.PokemonReviewsAdapter
 import com.unitewikiapp.unitewiki.databinding.FragmentPokemonReviewsBinding
 import com.unitewikiapp.unitewiki.datas.PokemonReviewsData
-import com.unitewikiapp.unitewiki.utils.Constants
 import com.unitewikiapp.unitewiki.utils.LocaleStore
-import com.unitewikiapp.unitewiki.utils.ShortPopupWindow
-import com.unitewikiapp.unitewiki.viewmodels.LoginViewModel
+import com.unitewikiapp.unitewiki.utils.ReviewPopup
+import com.unitewikiapp.unitewiki.viewmodels.AuthViewModel
+import com.unitewikiapp.unitewiki.viewmodels.PokemonInfoViewModel
 import com.unitewikiapp.unitewiki.viewmodels.PokemonReviewsViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class PokemonReviewsFragment : Fragment(), PokemonReviewsAdapter.ClickCallback{
-
-    private lateinit var pokemonName:String
-    private val viewModel:PokemonReviewsViewModel by viewModels()
-    private val loginViewModel:LoginViewModel by activityViewModels()
-    private val reviewsAdapter = PokemonReviewsAdapter(false,this, localeStore, loginViewModel.currentUser.value)
-    private val myReviewAdapter = PokemonReviewsAdapter(true,this, localeStore, loginViewModel.currentUser.value)
-    private var _binding:FragmentPokemonReviewsBinding? = null
-    private val binding get() = _binding!!
+class PokemonReviewsFragment : Fragment(), PokemonReviewsAdapter.ClickCallback, ReviewPopup.ClickCallback{
 
     @Inject
     lateinit var localeStore: LocaleStore
 
+    private lateinit var pokemonName:String
+    private val reviewViewModel:PokemonReviewsViewModel by activityViewModels()
+    private val infoViewModel:PokemonInfoViewModel by activityViewModels()
+    private val authViewModel:AuthViewModel by activityViewModels()
+    private var _binding:FragmentPokemonReviewsBinding? = null
+    private val binding get() = _binding!!
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         pokemonName =arguments?.getString("pokemonname")?:""
+        infoViewModel.setCurrentPokemon(pokemonName)
     }
 
     override fun onCreateView(
@@ -51,6 +49,8 @@ class PokemonReviewsFragment : Fragment(), PokemonReviewsAdapter.ClickCallback{
         ): View? {
         _binding = FragmentPokemonReviewsBinding.inflate(inflater,container,false)
 
+        val reviewsAdapter = PokemonReviewsAdapter(false,this, localeStore, authViewModel.currentUser.value)
+        val myReviewAdapter = PokemonReviewsAdapter(true,this, localeStore, authViewModel.currentUser.value)
         runBlocking {
 
         binding.apply {
@@ -85,10 +85,14 @@ class PokemonReviewsFragment : Fragment(), PokemonReviewsAdapter.ClickCallback{
 
                 pop.setOnMenuItemClickListener { item->
                     when (item.itemId){
-                        R.id.sortbylikes-> {removeReviewsListener()
-                                            addReviewsListeners(Constants.QUERY_LIKES_NUMBER)}
-                        R.id.sortbyrecent->{ removeReviewsListener()
-                                            addReviewsListeners(Constants.QUERY_TIME) }
+                        R.id.sortbylikes-> {
+                            val sorted = reviewViewModel.getLikeSortedReview(infoViewModel.currentPokemon.value!!.pokemon_name)
+                            reviewsAdapter.submitList(sorted.filter { authViewModel.currentUser.value?.uid != it.uid })
+                        }
+                        R.id.sortbyrecent->{
+                            val sorted = reviewViewModel.getTimeSortedReview(infoViewModel.currentPokemon.value!!.pokemon_name)
+                            reviewsAdapter.submitList(sorted.filter { authViewModel.currentUser.value?.uid != it.uid })
+                        }
                     }
                     false
                 }
@@ -101,29 +105,20 @@ class PokemonReviewsFragment : Fragment(), PokemonReviewsAdapter.ClickCallback{
         return binding.root
     }
 
-    private fun addReviewsListeners(query:String){
-        viewModel.addReviewValueListener(pokemonName,query)
-    }
+    private fun subscribeUI(adapter:PokemonReviewsAdapter,myReviewAdapter: PokemonReviewsAdapter) {
+        binding.apply {
+            isEmpty = reviewViewModel.reviews.value.isNullOrEmpty()
 
-    private fun removeReviewsListener(){
-        viewModel.removeReviewValueListener(pokemonName,Constants.QUERY_TIME)
-    }
-
-    private fun subscribeUI(adapter:PokemonReviewsAdapter,myadapter: PokemonReviewsAdapter) {
-        addReviewsListeners(Constants.QUERY_LIKES_NUMBER)
-        runBlocking {
-            launch {
-                viewModel.reviewData.observe(viewLifecycleOwner) {
-                    binding.isEmpty = it.isNullOrEmpty()
-                    adapter.submitList(it)
+            reviewViewModel.reviewSnapshot.observe(viewLifecycleOwner){
+                reviewViewModel.setReviews()
+                val reviews = reviewViewModel.getLikeSortedReview(infoViewModel.currentPokemon.value!!.pokemon_name)
+                val (myReview, others) = reviews.partition {
+                    it.uid == authViewModel.currentUser.value?.uid
                 }
-            }.join()
-            launch {
-                viewModel.myReviewData.observe(viewLifecycleOwner) {
-                    binding.doIwritereivew = !(it.isNullOrEmpty())
-                    myadapter.submitList(it)
-                }
-            }.join()
+                isMyReviewExist = myReview.isNotEmpty()
+                adapter.submitList(others)
+                myReviewAdapter.submitList(myReview)
+            }
         }
     }
 
@@ -132,88 +127,68 @@ class PokemonReviewsFragment : Fragment(), PokemonReviewsAdapter.ClickCallback{
         _binding = null
     }
 
-    override fun onClickLikeButton(position:Int, itemData:PokemonReviewsData?, likeView:ImageView) {
-        val user = loginViewModel.currentUser.value
-        if(user != null){
-            //viewModel.onLikeClicked(pokemonName,user.uid,itemData!!.uid!!)
-        } else{
-            loginViewModel.signIn(requireActivity())
+    override fun onClickLikeButton(
+        position: Int,
+        itemData: PokemonReviewsData?,
+        likeView: ImageView
+    ) {
+        val user = authViewModel.currentUser.value
+        if(user == null){
+            authViewModel.signIn(requireActivity())
+            return
         }
+        reviewViewModel.updateLike(itemData!!, user)
     }
 
-    override fun onClickPopupEditMenu(position: Int, itemData: PokemonReviewsData?, anchor: ImageView) {
-        val user = loginViewModel.currentUser.value
-        var pop = PopupMenu(context,anchor)
-        pop.inflate(R.menu.edit_menu)
-
-        pop.setOnMenuItemClickListener { item->
-            when (item.itemId){
-                R.id.edit-> {
-                    if(user!= null){
-                        val direction = PokemonReviewsFragmentDirections.actionPokemonReviewsFragmentToReviewWritingFragment(pokemonName,true)
-                        findNavController().navigate(direction)
-                    }else{
-                        Toast.makeText(context, R.string.needtologin, Toast.LENGTH_SHORT).show()
-                    }
-                }
-                R.id.delete ->{
-                    if(user!=null){
-                        viewModel.removeMyReview(pokemonName,user.uid!!)
-                        val loginPopup = ShortPopupWindow(context)
-                        loginPopup.setText(context?.resources?.getString(R.string.deletereivewsuccess))
-                        if(!loginPopup.isTooltipShown) {
-                            loginPopup.showToolTip(binding.btnSetting)
-                        }
-                    }else{
-                        Toast.makeText(context, R.string.needtologin, Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
-            false
+    override fun onClickPopupMenu(
+        position: Int,
+        itemData: PokemonReviewsData?,
+        anchor: ImageView
+    ) {
+        val user = authViewModel.currentUser.value
+        if (user==null){
+            authViewModel.signIn(requireActivity())
+            return
         }
-        pop.show()
+        val menu:Int = if (itemData!!.uid==user.uid){
+            R.menu.edit_menu
+        } else {
+            R.menu.report_menu
+        }
+        ReviewPopup.showMenu(
+            context = requireActivity(),
+            anchor = anchor,
+            menuRes = menu,
+            review = itemData,
+            position = position,
+            clickCallback = this
+        )
     }
 
-    override fun onClickPopupReportMenu(position: Int, itemData:PokemonReviewsData?, anchor:ImageView) {
-        val user = loginViewModel.currentUser.value
-        val pop = PopupMenu(context,anchor)
-        pop.inflate(R.menu.report_menu)
-        pop.setOnMenuItemClickListener { item->
-            when (item.itemId){
-                R.id.report-> {
-                    if(user != null){
-                        viewModel.setReportTrue(pokemonName,user.uid,itemData!!.uid!!)
-                        val reportPopup = ShortPopupWindow(context)
-                        reportPopup.setText(context?.resources?.getString(R.string.reviewreported))
-                        if(!reportPopup.isTooltipShown){
-                            reportPopup.showToolTip(binding.btnSetting)
-                        }
-                    }else{
-                        val loginPopup = ShortPopupWindow(context)
-                        loginPopup.setText(context?.resources?.getString(R.string.needlogingtodothis))
-                        if(!loginPopup.isTooltipShown){
-                            loginPopup.showToolTip(binding.btnSetting)
-                        }
-                    }
-                }
+    override fun onPopupMenuItemClick(itemId: Int, position:Int, itemData: PokemonReviewsData?, anchor: View){
+        when (itemId) {
+            R.id.edit -> {
+                val direction = PokemonReviewsFragmentDirections.actionPokemonReviewsFragmentToReviewWritingFragment(pokemonName, true)
+                reviewViewModel.draft.value = itemData
+                findNavController().navigate(direction)
             }
-            false
+            R.id.delete -> {
+                reviewViewModel.removeReview(itemData!!)
+            }
+            R.id.report -> {
+                reviewViewModel.reportReview(itemData!!, authViewModel.currentUser.value!!)
+            }
         }
-        pop.show()
     }
 
     private fun navigateAfterLoginCheck(){
-        val user = loginViewModel.currentUser.value
+        val user = authViewModel.currentUser.value
         if(user?.uid!=null){
-            val direction = PokemonReviewsFragmentDirections.actionPokemonReviewsFragmentToReviewWritingFragment(pokemonName,false)
+            val direction = PokemonReviewsFragmentDirections.actionPokemonReviewsFragmentToReviewWritingFragment(pokemonName, false)
             findNavController().navigate(direction)
         } else {
-            loginViewModel.signIn(requireActivity())
+            authViewModel.signIn(requireActivity())
         }
-    }
-
-    fun signOut() {
-        loginViewModel.getAuthUI().signOut(requireActivity())
     }
 
 }

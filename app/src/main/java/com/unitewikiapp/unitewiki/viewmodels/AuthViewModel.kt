@@ -22,7 +22,7 @@ import javax.inject.Inject
 const val signInCode:Int = 100
 
 @HiltViewModel
-class LoginViewModel @Inject constructor(
+class AuthViewModel @Inject constructor(
     private val googleSignInClient: GoogleSignInClient,
     private val auth: FirebaseAuth,
     private val authUI:AuthUI

@@ -12,7 +12,7 @@ import androidx.navigation.findNavController
 import com.unitewikiapp.unitewiki.MainActivity
 import com.unitewikiapp.unitewiki.databinding.FragmentSettingBinding
 import com.unitewikiapp.unitewiki.utils.PreferenceManager
-import com.unitewikiapp.unitewiki.viewmodels.LoginViewModel
+import com.unitewikiapp.unitewiki.viewmodels.AuthViewModel
 import com.unitewikiapp.unitewiki.views.dialogfragments.LanguageDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
@@ -24,7 +24,7 @@ class SettingFragment : Fragment(), LanguageDialogFragment.OnLanguageSelected {
     private val binding get() = _binding!!
 
     private val languageDialog = LanguageDialogFragment()
-    private val loginViewModel: LoginViewModel by activityViewModels()
+    private val authViewModel: AuthViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,11 +37,11 @@ class SettingFragment : Fragment(), LanguageDialogFragment.OnLanguageSelected {
     ): View? {
         _binding = FragmentSettingBinding.inflate(inflater,container,false)
         binding.apply {
-            loginViewModel.currentUser.observe(viewLifecycleOwner){
+            authViewModel.currentUser.observe(viewLifecycleOwner){
                 when(it){
                     null -> isSignedIn = false
                     else -> {isSignedIn = true
-                            viewModel = loginViewModel}
+                            viewModel = authViewModel}
                 }
             }
             btnLanguage.setOnClickListener {
@@ -51,15 +51,15 @@ class SettingFragment : Fragment(), LanguageDialogFragment.OnLanguageSelected {
                 languageDialog.show(requireActivity().supportFragmentManager,"SelectLanguage")
             }
             btnLogout.setOnClickListener {
-                loginViewModel.getAuthUI().signOut(requireActivity())
+                authViewModel.getAuthUI().signOut(requireActivity())
             }
             btnLoginwithother.setOnClickListener {
-                loginViewModel.getAuthUI().signOut(requireActivity()).addOnCompleteListener {
-                    loginViewModel.signIn(requireActivity())
+                authViewModel.getAuthUI().signOut(requireActivity()).addOnCompleteListener {
+                    authViewModel.signIn(requireActivity())
                 }
             }
             btnLogin.setOnClickListener {
-                loginViewModel.signIn(requireActivity())
+                authViewModel.signIn(requireActivity())
             }
             navigateBackbtn.setOnClickListener {
                 it.findNavController().popBackStack()

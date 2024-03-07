@@ -6,8 +6,11 @@
 
     <data>
         <variable
-            name="viewModel"
-            type="com.unitewikiapp.unitewiki.viewmodels.PokemonReviewWrtingViewModel" />
+            name="infoVm"
+            type="com.unitewikiapp.unitewiki.viewmodels.PokemonInfoViewModel" />
+        <variable
+            name="reviewVm"
+            type="com.unitewikiapp.unitewiki.viewmodels.PokemonReviewsViewModel" />
 
         <variable
             name="skill1Selected"
@@ -63,7 +66,7 @@
             app:layout_constraintRight_toRightOf="parent"
             android:layout_marginTop="5dp"
             android:fontFamily="@font/aritadotum_medium"
-            android:text="@{viewModel.infoData.pokemon_name}"
+            app:localizedText="@{infoVm.currentPokemon.pokemon_name}"
             android:textSize="25sp"/>
 
         <TextView
@@ -122,7 +125,7 @@
                     android:layout_height="70dp"
                     android:numStars="5"
                     android:progressDrawable="@drawable/custom_ratingbar_spacing"
-                    android:rating="1"
+                    android:rating="@{reviewVm.draft.rating}"
                     android:stepSize="1"
                     android:isIndicator="false"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -156,7 +159,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:fontFamily="@font/aritadotum"
-                        android:text="@{viewModel.infoData.skillset1_level}"
+                        android:text="@{infoVm.currentPokemon.skills[0].min_level}"
                         android:textSize="15sp"
                         app:layout_constraintBottom_toTopOf="@id/skill1"
                         app:layout_constraintLeft_toLeftOf="parent"
@@ -170,8 +173,8 @@
                         android:layout_marginTop="10dp"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:clickable="true"
-                        app:imageFromUrl="@{viewModel.infoData.skill1}"
-                        app:isSkillSelected="@{viewModel.firstClickState}"
+                        app:imageFromUrl="@{infoVm.currentPokemon.skills[0].ic}"
+                        app:isLeftSelected="@{skill1Selected}"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/skilllevel1" />
 
@@ -182,7 +185,7 @@
                         android:layout_marginTop="10dp"
                         android:src="@drawable/ic_thick_circle"
                         android:visibility="invisible"
-                        app:isVisible="@{viewModel.firstClickState}"
+                        app:isVisible="@{skill1Selected}"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/skilllevel1" />
 
@@ -194,8 +197,8 @@
                         android:layout_marginTop="10dp"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:clickable="true"
-                        app:isSkillSelected="@{!viewModel.firstClickState}"
-                        app:imageFromUrl="@{viewModel.infoData.skill2}"
+                        app:isLeftSelected="@{!skill1Selected}"
+                        app:imageFromUrl="@{infoVm.currentPokemon.skills[1].ic}"
                         app:layout_constraintLeft_toRightOf="@id/skill1"
                         app:layout_constraintTop_toBottomOf="@id/skilllevel1" />
 
@@ -206,7 +209,7 @@
                         android:layout_marginLeft="10dp"
                         android:layout_marginTop="10dp"
                         android:src="@drawable/ic_thick_circle"
-                        app:isVisible="@{!viewModel.firstClickState}"
+                        app:isVisible="@{!skill1Selected}"
                         android:visibility="invisible"
                         app:layout_constraintLeft_toRightOf="@id/skill1"
                         app:layout_constraintTop_toBottomOf="@id/skilllevel1" />
@@ -226,7 +229,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
-                        android:text="@{viewModel.infoData.skillset2_level}"
+                        android:text="@{infoVm.currentPokemon.skills[2].min_level}"
                         android:textSize="15sp"
                         app:layout_constraintBottom_toTopOf="@id/skill3"
                         app:layout_constraintLeft_toLeftOf="parent"
@@ -240,8 +243,8 @@
                         android:layout_marginTop="10dp"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:clickable="true"
-                        app:isSkillSelected="@{viewModel.secondClickState}"
-                        app:imageFromUrl="@{viewModel.infoData.skill3}"
+                        app:isLeftSelected="@{skill3Selected}"
+                        app:imageFromUrl="@{infoVm.currentPokemon.skills[2].ic}"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/skilllevel2" />
 
@@ -251,7 +254,7 @@
                         android:layout_height="70dp"
                         android:layout_marginTop="10dp"
                         android:src="@drawable/ic_thick_circle"
-                        app:isVisible="@{viewModel.secondClickState}"
+                        app:isVisible="@{skill3Selected}"
                         android:visibility="invisible"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/skilllevel2" />
@@ -264,8 +267,8 @@
                         android:layout_marginTop="10dp"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:clickable="true"
-                        app:isSkillSelected="@{!viewModel.secondClickState}"
-                        app:imageFromUrl="@{viewModel.infoData.skill4}"
+                        app:isLeftSelected="@{!skill3Selected}"
+                        app:imageFromUrl="@{infoVm.currentPokemon.skills[3].ic}"
                         app:layout_constraintLeft_toRightOf="@id/skill3"
                         app:layout_constraintTop_toBottomOf="@id/skilllevel2" />
 
@@ -276,7 +279,7 @@
                         android:layout_marginLeft="10dp"
                         android:layout_marginTop="10dp"
                         android:visibility="invisible"
-                        app:isVisible="@{!viewModel.secondClickState}"
+                        app:isVisible="@{!skill3Selected}"
                         android:src="@drawable/ic_thin_circle"
                         app:layout_constraintLeft_toRightOf="@id/skill3"
                         app:layout_constraintTop_toBottomOf="@id/skilllevel2" />
@@ -302,6 +305,7 @@
                 android:background="@drawable/square_border"
                 android:padding="10dp"
                 android:hint="@string/pleaseenteryourguide"
+                android:text="@{reviewVm.draft.writing}"
                 android:maxLength="1000" />
 
             <TextView

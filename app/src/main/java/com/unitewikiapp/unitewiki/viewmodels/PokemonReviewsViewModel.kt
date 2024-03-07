@@ -3,7 +3,6 @@ package com.unitewikiapp.unitewiki.viewmodels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -19,15 +18,18 @@ import javax.inject.Inject
 @HiltViewModel
 class PokemonReviewsViewModel @Inject constructor(
     private val repository:ReviewRepository,
-    private val auth: FirebaseAuth,
     private val localeStore: LocaleStore
     ) : ViewModel(){
 
     private val _reviewSnapshot = MutableLiveData<DataSnapshot?>()
     val reviewSnapshot get() = _reviewSnapshot
 
-    private val _currentReviews = MutableLiveData<List<PokemonReviewsData>>()
-    val currentReviews get() = _currentReviews
+    private val _reviews = MutableLiveData<List<PokemonReviewsData>>()
+    val reviews get() = _reviews
+
+
+    private val _draft = MutableLiveData<PokemonReviewsData>()
+    val draft get() = _draft
 
     init {
         fetchReviewSnapshot()
@@ -39,16 +41,15 @@ class PokemonReviewsViewModel @Inject constructor(
             when (snapShot){
                 is Response.Success -> {
                     reviewSnapshot.value = snapShot.data
-                    setCurrentReviews()
                 }
                 else -> {
-                    throw Exception("Failed to fetch data")
+                    throw Exception("Failed to fetch review data")
                 }
             }
         }
     }
 
-    fun setCurrentReviews(){
+    fun setReviews(){
         val reviewsList = ArrayList<PokemonReviewsData>()
         reviewSnapshot.value!!.children.forEach{ pokemonSnap->
             pokemonSnap.children.forEach { reviewSnap ->
@@ -56,12 +57,19 @@ class PokemonReviewsViewModel @Inject constructor(
                 reviewsList.add(data)
             }
         }
-        _currentReviews.value = reviewsList
+        _reviews.value = reviewsList
     }
 
+    fun setDraft(draft:PokemonReviewsData){
+        _draft.value = draft
+    }
+
+    fun cleanDraft(){
+        _draft.value = PokemonReviewsData()
+    }
 
     fun sortPokemonByScore(unSorted: ArrayList<PokemonRankData>): ArrayList<PokemonRankData>{
-        val averageScoreMap = currentReviews.value!!.groupBy { it.pokemon!!.localized(localeStore.locale!!) }
+        val averageScoreMap = reviews.value!!.groupBy { it.pokemon!!.localized(localeStore.locale!!) }
             .mapValues { (key, reviews) ->
                 reviews.map { it.rating }.average().toFloat()
             }
@@ -75,13 +83,13 @@ class PokemonReviewsViewModel @Inject constructor(
     }
 
     fun getReviewCount(pokemonName: LocaleField): Int{
-        return currentReviews.value!!.count {
+        return reviews.value!!.count {
             it.pokemon!!.localized(localeStore.locale!!) == pokemonName.localized(localeStore.locale!!)
         }
     }
 
     fun getAverageScore(pokemonName: LocaleField): Float {
-        val averageScoreMap = currentReviews.value!!.groupBy {
+        val averageScoreMap = reviews.value!!.groupBy {
             it.pokemon!!.localized(localeStore.locale!!)
         }.mapValues { (key, reviews) ->
             reviews.map { it.rating }.average().toFloat()
@@ -92,7 +100,7 @@ class PokemonReviewsViewModel @Inject constructor(
 
     fun getSkillPreference(pokemonName: LocaleField):ArrayList<Int>  {
         val counts = ArrayList(listOf(0, 0, 0, 0))
-        val _review = currentReviews.value!!.filter {
+        val _review = reviews.value!!.filter {
             it.pokemon!!.localized(localeStore.locale!!) == pokemonName.localized(localeStore.locale!!)
         }
         _review.forEach { review ->
@@ -106,10 +114,16 @@ class PokemonReviewsViewModel @Inject constructor(
         return counts
     }
 
-    fun getSortedReview(pokemonName: LocaleField):List<PokemonReviewsData>{
-        return currentReviews.value!!.filter {
+    fun getLikeSortedReview(pokemonName: LocaleField):List<PokemonReviewsData>{
+        return reviews.value!!.filter {
             it.pokemon!!.localized(localeStore.locale!!) == pokemonName.localized(localeStore.locale!!)
         }.sortedByDescending { it.likes.size }
+    }
+
+    fun getTimeSortedReview(pokemonName: LocaleField):List<PokemonReviewsData>{
+        return reviews.value!!.filter {
+            it.pokemon!!.localized(localeStore.locale!!) == pokemonName.localized(localeStore.locale!!)
+        }.sortedByDescending { it.time }
     }
 
     fun calculatePreference(a: Int, b: Int):Int{
@@ -164,6 +178,20 @@ class PokemonReviewsViewModel @Inject constructor(
         }
     }
 
+    fun addReview(
+        review: PokemonReviewsData
+    ){
+        viewModelScope.launch {
+            val ref = repository.fetchReviewReference(review)
+            if (ref is Response.Success){
+                ref.data.setValue(review)
+                fetchReviewSnapshot()
+            } else {
+                throw Exception("Failed to add Review")
+            }
+        }
+    }
+
     fun removeReview(
         review: PokemonReviewsData
     ){
@@ -205,7 +233,7 @@ class PokemonReviewsViewModel @Inject constructor(
                     }
                 })
             } else {
-                throw Exception("Failed to remove Review")
+                throw Exception("Failed to report Review")
             }
         }
     }

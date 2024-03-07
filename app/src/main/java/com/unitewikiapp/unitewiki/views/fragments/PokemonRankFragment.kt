@@ -54,7 +54,7 @@ class PokemonRankFragment : Fragment() {
 
         combined.observe(viewLifecycleOwner){ (infoSnap, reviewSnap) ->
             if (reviewSnap != null){
-                reviewViewModel.setCurrentReviews()
+                reviewViewModel.setReviews()
             }
             if (reviewSnap != null && infoSnap != null){
                 binding.loadComplete = true

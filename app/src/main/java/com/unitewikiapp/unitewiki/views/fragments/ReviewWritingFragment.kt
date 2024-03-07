@@ -43,6 +43,7 @@ class ReviewWritingFragment : Fragment()
         super.onCreate(savedInstanceState)
         pokemonname =arguments?.getString("pokemonname")?:""
         isEditing = arguments?.getBoolean("IsEditing")?:false
+        infoViewModel.setCurrentPokemon(pokemonname)
     }
 
     override fun onCreateView(

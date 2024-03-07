@@ -42,8 +42,8 @@ fun bindIsLiked(view: ImageView, isLiked: Boolean?) {
     }
 }
 
-@BindingAdapter("isSkillSelected")
-fun bindIsSkillSelected(view: ImageView, isSelected: Boolean?) {
+@BindingAdapter("isLeftSelected")
+fun bindIsLeftSelected(view: ImageView, isSelected: Boolean?) {
     val greymatrix = ColorMatrix().apply { setSaturation(0.0f) }
     view.colorFilter = if (isSelected==false) {
         ColorMatrixColorFilter(greymatrix)

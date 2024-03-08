@@ -4,10 +4,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.database.DataSnapshot
-import com.unitewikiapp.unitewiki.datas.InfoRepository
-import com.unitewikiapp.unitewiki.datas.PokemonInfoData
-import com.unitewikiapp.unitewiki.datas.PokemonRankData
-import com.unitewikiapp.unitewiki.datas.localized
+import com.librarydevloperjo.kcs.KCS
+import com.unitewikiapp.unitewiki.datas.*
 import com.unitewikiapp.unitewiki.utils.LocaleStore
 import com.unitewikiapp.unitewiki.utils.Response
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -58,6 +56,36 @@ class PokemonInfoViewModel @Inject constructor(
             }
         }
         return ranksList
+    }
+
+    fun getList(): ArrayList<PokemonInfoData>{
+        val list = ArrayList<PokemonInfoData>()
+        infoSnapshot.value!!.children.forEach { snap->
+            val data = snap.getValue(PokemonInfoData::class.java)!!
+            list.add(data)
+        }
+        return list
+    }
+
+    fun getListByAlphabet(): ArrayList<SearchListParentData>{
+        val list = getList()
+        val groups = list.groupBy { it ->
+            val name = it.pokemon_name.localized(localeStore.locale!!)
+            when(localeStore.locale){
+                "ko" -> KCS.getCho(name.substring(0,1))
+                else -> name.substring(0,1)
+            }
+        }
+        val listByAlphabet = ArrayList<SearchListParentData>()
+        groups.forEach { key, value ->
+            listByAlphabet.add(
+                SearchListParentData(
+                    firstLetter = key,
+                    childList = ArrayList(value)
+                )
+            )
+        }
+        return listByAlphabet
     }
 
     fun setCurrentPokemon(name: String) {

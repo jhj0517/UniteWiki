@@ -8,18 +8,25 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.unitewikiapp.unitewiki.databinding.LetterSignBinding
-import com.unitewikiapp.unitewiki.datas.PokemonSearchData
+import com.unitewikiapp.unitewiki.datas.SearchListParentData
+import com.unitewikiapp.unitewiki.utils.LocaleStore
+import com.unitewikiapp.unitewiki.viewmodels.SearchListParentAdapterViewModel
 
-class SearchListParentAdapter(private val context: Context)
-    : ListAdapter<PokemonSearchData,SearchListParentAdapter.ViewHolder>(diffUtil) {
+class SearchListParentAdapter(
+    private val context: Context,
+    private val localeStore: LocaleStore
+) : ListAdapter<SearchListParentData,SearchListParentAdapter.ViewHolder>(diffUtil) {
 
     inner class ViewHolder(val binding: LetterSignBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(items: PokemonSearchData) {
-            binding.Letter.text = items.letter
-            val adapter = PokemonSearchAdapter()
-            adapter.setData(items.childList)
+        fun bind(items: SearchListParentData) {
+            with(binding){
+                viewModel =  SearchListParentAdapterViewModel(items)
+                executePendingBindings()
+            }
+            val adapter = PokemonSearchAdapter(localeStore)
             binding.ChildRecyclerView.adapter = adapter
             binding.ChildRecyclerView.layoutManager = GridLayoutManager(context, 5)
+            adapter.setData(items.childList)
         }
     }
 
@@ -40,12 +47,12 @@ class SearchListParentAdapter(private val context: Context)
     }
 
     companion object {
-        val diffUtil = object : DiffUtil.ItemCallback<PokemonSearchData>() {
-            override fun areContentsTheSame(oldItem: PokemonSearchData, newItem: PokemonSearchData) =
+        val diffUtil = object : DiffUtil.ItemCallback<SearchListParentData>() {
+            override fun areContentsTheSame(oldItem: SearchListParentData, newItem: SearchListParentData) =
                 oldItem == newItem
 
-            override fun areItemsTheSame(oldItem: PokemonSearchData, newItem: PokemonSearchData) =
-                oldItem.pokemon_name == newItem.pokemon_name
+            override fun areItemsTheSame(oldItem: SearchListParentData, newItem: SearchListParentData) =
+                oldItem == newItem
         }
     }
 }

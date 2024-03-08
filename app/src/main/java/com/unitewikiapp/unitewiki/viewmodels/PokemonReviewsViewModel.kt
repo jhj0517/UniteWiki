@@ -27,7 +27,6 @@ class PokemonReviewsViewModel @Inject constructor(
     private val _reviews = MutableLiveData<List<PokemonReviewsData>>()
     val reviews get() = _reviews
 
-
     private val _draft = MutableLiveData<PokemonReviewsData>()
     val draft get() = _draft
 

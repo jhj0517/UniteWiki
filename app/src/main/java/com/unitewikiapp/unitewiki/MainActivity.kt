@@ -8,7 +8,7 @@ import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.unitewikiapp.unitewiki.utils.ContextWrapper
-import com.unitewikiapp.unitewiki.utils.PreferenceManager
+import com.unitewikiapp.unitewiki.utils.LocaleStore
 import com.unitewikiapp.unitewiki.viewmodels.AuthViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
@@ -42,16 +42,10 @@ class MainActivity : AppCompatActivity () {
         return super.onCreateView(name, context, attrs)
     }
 
-    private val prefManager: PreferenceManager = PreferenceManager()
-
     override fun attachBaseContext(newBase: Context?) {
-        var localelang = prefManager.getString(newBase!!,"locale")?.lowercase()
-        when(localelang){
-            "ko_kr" -> {}
-            else -> localelang = "en"
-        }
-        val locale = Locale(localelang)
-        super.attachBaseContext(ContextWrapper.wrap(newBase,locale))
+        val localeStore = LocaleStore(newBase!!)
+        val locale = localeStore.locale
+        super.attachBaseContext(ContextWrapper.wrap(newBase, Locale(locale!!)))
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

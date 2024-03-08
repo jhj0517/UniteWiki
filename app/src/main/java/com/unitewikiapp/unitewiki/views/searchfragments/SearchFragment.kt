@@ -6,37 +6,36 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import com.unitewikiapp.unitewiki.adapters.PokemonSearchAdapter
 import com.unitewikiapp.unitewiki.databinding.FragmentSearchBinding
+import com.unitewikiapp.unitewiki.utils.LocaleStore
+import com.unitewikiapp.unitewiki.viewmodels.PokemonInfoViewModel
 import com.unitewikiapp.unitewiki.viewmodels.PokemonSearchViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class SearchFragment : Fragment(){
 
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!
-    private val viewModel : PokemonSearchViewModel by activityViewModels()
-    private var pokemonadapter: PokemonSearchAdapter = PokemonSearchAdapter()
+    private val queryViewModel : PokemonSearchViewModel by activityViewModels()
+    private val infoViewModel : PokemonInfoViewModel by activityViewModels()
+    @Inject
+    lateinit var localeStore: LocaleStore
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
         _binding = FragmentSearchBinding.inflate(inflater, container, false)
-        subscribe_UI()
+        val adapter = PokemonSearchAdapter(localeStore)
+        subscribeUI(adapter)
 
         binding.apply {
-            serachRecyclerview.adapter = pokemonadapter
+            serachRecyclerview.adapter = adapter
             serachRecyclerview.layoutManager = GridLayoutManager(activity, 5)
-
-            viewModel.getQuery()!!.observe(viewLifecycleOwner,object :Observer<String>{
-                override fun onChanged(str: String?) {
-                    pokemonadapter.filter.filter(str)
-                }
-            })
         }
         return binding.root
     }
@@ -46,12 +45,17 @@ class SearchFragment : Fragment(){
         super.onDestroyView()
     }
 
+    private fun subscribeUI(adapter:PokemonSearchAdapter){
+        infoViewModel.infoSnapshot.observe(viewLifecycleOwner) {
+            if (it!=null){
+                binding.loaded = true
+                val list = infoViewModel.getList()
+                adapter.setData(list)
+            }
+        }
 
-    private fun subscribe_UI(){
-        viewModel.getSearchData()
-        viewModel.pokemondatalist.observe(viewLifecycleOwner) { result ->
-            binding.loaded = !(result.isNullOrEmpty())
-            pokemonadapter.setData(result)
+        queryViewModel.query.observe(viewLifecycleOwner){
+            adapter.filter.filter(it)
         }
     }
 

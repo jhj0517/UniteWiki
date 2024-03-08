@@ -8,22 +8,27 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.librarydevloperjo.kcs.KCS
 import com.unitewikiapp.unitewiki.databinding.ItemPokemonSearchBinding
-import com.unitewikiapp.unitewiki.datas.PokemonSearchData
+import com.unitewikiapp.unitewiki.datas.PokemonInfoData
+import com.unitewikiapp.unitewiki.datas.localized
+import com.unitewikiapp.unitewiki.utils.LocaleStore
+import com.unitewikiapp.unitewiki.viewmodels.PokemonSearchAdapterViewModel
 import com.unitewikiapp.unitewiki.views.searchfragments.SearchMainFragmentDirections
 
-class PokemonSearchAdapter:
-    ListAdapter<PokemonSearchData,PokemonSearchAdapter.ViewHolder>(diffUtil), Filterable {
+class PokemonSearchAdapter(
+    localeStore: LocaleStore
+): ListAdapter<PokemonInfoData,PokemonSearchAdapter.ViewHolder>(diffUtil), Filterable {
 
-    private var list = arrayListOf<PokemonSearchData>()
+    private var list = arrayListOf<PokemonInfoData>()
 
     inner class ViewHolder(val binding:ItemPokemonSearchBinding): RecyclerView.ViewHolder(binding.root){
 
-        fun bind(items: PokemonSearchData){
-            binding.pokemonName.text = items.pokemon_name
-            Glide.with(itemView).load(items.ic_pokemon).into(binding.icPokemon)
+        fun bind(items: PokemonInfoData){
+            with(binding){
+                viewModel = PokemonSearchAdapterViewModel(items)
+                executePendingBindings()
+            }
         }
 
         init{
@@ -54,7 +59,7 @@ class PokemonSearchAdapter:
         return searchFilter
     }
 
-    fun setData(list: ArrayList<PokemonSearchData>?){
+    fun setData(list: ArrayList<PokemonInfoData>?){
         this.list = list!!
         submitList(list)
     }
@@ -62,14 +67,14 @@ class PokemonSearchAdapter:
     private val searchFilter : Filter = object : Filter() {
         override fun performFiltering(constraint: CharSequence): FilterResults {
 
-            val filteredList: ArrayList<PokemonSearchData> = ArrayList()
+            val filteredList: ArrayList<PokemonInfoData> = ArrayList()
             if (constraint.isEmpty()) {
                 filteredList.addAll(list)
             } else {
                 val filterPattern = constraint.toString().lowercase().trim { it <= ' '}
 
                 for (item in list) {
-                    if(KCS.match(filterPattern,item.pokemon_name!!.lowercase())){
+                    if(KCS.match(filterPattern,item.pokemon_name.localized(localeStore.locale!!).lowercase())){
                         filteredList.add(item)
                     }
                 }
@@ -80,16 +85,16 @@ class PokemonSearchAdapter:
         }
 
         override fun publishResults(constraint: CharSequence, results: FilterResults) {
-            submitList(results.values as ArrayList<PokemonSearchData>)
+            submitList(results.values as ArrayList<PokemonInfoData>)
         }
     }
 
     companion object {
-        val diffUtil = object : DiffUtil.ItemCallback<PokemonSearchData>() {
-            override fun areContentsTheSame(oldItem: PokemonSearchData, newItem: PokemonSearchData) =
+        val diffUtil = object : DiffUtil.ItemCallback<PokemonInfoData>() {
+            override fun areContentsTheSame(oldItem: PokemonInfoData, newItem: PokemonInfoData) =
                 oldItem == newItem
 
-            override fun areItemsTheSame(oldItem: PokemonSearchData, newItem: PokemonSearchData) =
+            override fun areItemsTheSame(oldItem: PokemonInfoData, newItem: PokemonInfoData) =
                 oldItem.pokemon_name == newItem.pokemon_name
         }
     }

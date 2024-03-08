@@ -48,7 +48,8 @@ class SearchMainFragment : Fragment() {
                 override fun onTextChanged(
                     str: CharSequence, start: Int,
                     before: Int, count: Int,
-                ) { viewModel.setQuery(str.toString())
+                ) {
+                    viewModel.setQuery(str.toString())
 
                     when (str.toString()) {
                         "" -> {

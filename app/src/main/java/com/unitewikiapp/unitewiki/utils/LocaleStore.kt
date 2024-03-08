@@ -14,11 +14,9 @@ class LocaleStore(private val context: Context) {
     }
 
     fun findLocale() {
-        val currentLocale = prefManager.getString(context,"locale")
-        return when (currentLocale) {
-            null -> _locale = context.resources.configuration.locales.get(0).toString()
-            "ko_kr" -> _locale = "ko"
-            else -> _locale = "en"
-        }
+        var currentLocale = context.resources.configuration.locales.get(0).toString().lowercase()
+        currentLocale = if(currentLocale=="ko_kr") "ko" else currentLocale
+        prefManager.setString(context,"locale",currentLocale)
+        _locale = prefManager.getString(context,"locale")
     }
 }

@@ -11,7 +11,7 @@ import com.unitewikiapp.unitewiki.adapters.PokemonSearchAdapter
 import com.unitewikiapp.unitewiki.databinding.FragmentSearchBinding
 import com.unitewikiapp.unitewiki.utils.LocaleStore
 import com.unitewikiapp.unitewiki.viewmodels.PokemonInfoViewModel
-import com.unitewikiapp.unitewiki.viewmodels.PokemonSearchViewModel
+import com.unitewikiapp.unitewiki.viewmodels.QueryViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -20,7 +20,7 @@ class SearchFragment : Fragment(){
 
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!
-    private val queryViewModel : PokemonSearchViewModel by activityViewModels()
+    private val queryViewModel : QueryViewModel by activityViewModels()
     private val infoViewModel : PokemonInfoViewModel by activityViewModels()
     @Inject
     lateinit var localeStore: LocaleStore

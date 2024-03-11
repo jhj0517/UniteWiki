@@ -6,15 +6,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class PokemonSearchViewModel @Inject constructor(
-
-): ViewModel() {
-
+class QueryViewModel @Inject constructor(): ViewModel() {
     val _query = MutableLiveData<String>()
     val query get() = _query
 
     fun setQuery(queryData: String) {
         _query.value = queryData
     }
-
 }
